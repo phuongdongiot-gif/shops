@@ -1,0 +1,225 @@
+/*
+Theme Name: Shopping
+Theme URI: #
+Author: Antigravity
+Author URI: #
+Description: A premium, modern, high-performance E-commerce theme optimized for WooCommerce using Tailwind CSS.
+Version: 1.1.0
+License: GNU General Public License v2 or later
+Text Domain: shopping
+Tags: e-commerce, custom-background, custom-colors, custom-logo, custom-menu, featured-images, translation-ready, woocommerce
+*/
+
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+
+/* Base System Resets */
+body {
+  font-family: 'Inter', sans-serif;
+  color: #4B5563;
+  background-color: #F9FAFB;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
+  color: #111827;
+}
+
+/* Base WooCommerce Overrides to make it look premium */
+.woocommerce ul.products, 
+.woocommerce-page ul.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+.woocommerce ul.products::before,
+.woocommerce ul.products::after {
+  display: none !important;
+}
+
+/* 
+ * FIX TAILWIND CONFLICT
+ * WooCommerce injects .columns-x classes for semantic meaning.
+ * Tailwind interprets .columns-x as CSS multi-column layout (newspaper style),
+ * which completely demolishes grid/flex flows inside. We must override this!
+ */
+.woocommerce.columns-1, .woocommerce.columns-2, .woocommerce.columns-3,
+.woocommerce.columns-4, .woocommerce.columns-5, .woocommerce.columns-6,
+.woocommerce ul.products.columns-1, .woocommerce ul.products.columns-2, 
+.woocommerce ul.products.columns-3, .woocommerce ul.products.columns-4, 
+.woocommerce ul.products.columns-5, .woocommerce ul.products.columns-6 {
+  columns: auto !important;
+}
+
+.woocommerce ul.products li.product, 
+.woocommerce-page ul.products li.product {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  text-align: center;
+  
+  /* Reset WooCommerce core behaviors */
+  float: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+  
+  /* Flex layout to keep items structured */
+  display: flex !important;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  
+  /* Prevent multicolumn splitting */
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.woocommerce ul.products li.product:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.woocommerce ul.products li.product a img {
+  margin-bottom: 1rem;
+  border-radius: 0.375rem;
+  transition: transform 0.5s ease;
+  width: 100%;
+  object-fit: cover;
+}
+
+.woocommerce ul.products li.product:hover a img {
+  transform: scale(1.05);
+}
+
+.woocommerce ul.products li.product .woocommerce-loop-product__title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.125rem;
+  color: #111827;
+  margin-top: 0.5rem;
+}
+
+.woocommerce ul.products li.product .price {
+  color: #4F46E5;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.woocommerce ul.products li.product .button {
+  background-color: #fff7ed !important;
+  color: #ea580c !important;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  border: 1px solid #fed7aa;
+  transition: all 0.2s ease !important;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  display: inline-block;
+  margin-top: auto !important;
+}
+
+.woocommerce ul.products li.product .button:hover {
+  background-color: #ea580c !important;
+  color: white !important;
+  border-color: #ea580c;
+}
+
+.woocommerce div.product .product_title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.woocommerce div.product p.price {
+  color: #ea580c;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.woocommerce div.product form.cart .button {
+  background-color: #ea580c;
+  color: white;
+  border-radius: 0.5rem;
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+}
+
+.woocommerce div.product form.cart .button:hover {
+  background-color: #9a3412;
+}
+
+/* Ép ảnh trong phần mô tả sản phẩm full width 100% div */
+.woocommerce div.product .woocommerce-product-details__short-description img,
+.woocommerce div.product .woocommerce-Tabs-panel--description img,
+.woocommerce div.product .woocommerce-product-details__short-description .wp-block-image,
+.woocommerce div.product .woocommerce-Tabs-panel--description .wp-block-image {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+  margin: 1.5rem auto;
+  object-fit: contain;
+}
+
+/* Biến đổi text Categoris và Tags trong chi tiết sản phẩm thành dạng Badge */
+.product_meta .posted_in a, 
+.product_meta .tagged_as a {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background-color: #f3f4f6; /* bg-gray-100 */
+  color: #4b5563; /* text-gray-600 */
+  font-size: 0.65rem; /* ~10px để xinh xắn giống badge */
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 0.375rem; /* rounded-md */
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.product_meta .posted_in a:hover, 
+.product_meta .tagged_as a:hover {
+  background-color: #ea580c; /* bg-primary */
+  color: white;
+}
+
+/* Kiểu dáng cho Bộ lọc cửa hàng (Order sorting dropdown) */
+.woocommerce .woocommerce-before-shop-loop .woocommerce-result-count {
+  margin: 0;
+  color: #4b5563; /* text-gray-600 */
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+.woocommerce .woocommerce-before-shop-loop .woocommerce-ordering {
+  margin: 0;
+}
+.woocommerce .woocommerce-before-shop-loop .woocommerce-ordering select {
+  padding: 0.625rem 2.5rem 0.625rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem; /* rounded-lg */
+  background-color: white;
+  font-size: 0.875rem;
+  color: #374151; /* text-gray-700 */
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  transition: all 0.3s ease;
+}
+.woocommerce .woocommerce-before-shop-loop .woocommerce-ordering select:hover,
+.woocommerce .woocommerce-before-shop-loop .woocommerce-ordering select:focus {
+  border-color: #ea580c;
+  box-shadow: 0 0 0 1px #ea580c;
+}
