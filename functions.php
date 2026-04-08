@@ -21,6 +21,10 @@ function shopping_setup() {
 	// Enable support for Post Thumbnails on posts and pages.
 	add_theme_support( 'post-thumbnails' );
 
+    // Enable LearnPress Theme Support so our custom templates in /learnpress/ are loaded
+    add_theme_support( 'learnpress' );
+    add_theme_support( 'learnpress_custom_template' );
+
 	// This theme uses wp_nav_menu() in one location.
 	register_nav_menus(
 		array(
@@ -85,6 +89,56 @@ function shopping_setup() {
 	add_theme_support( 'learnpress' );
 }
 add_action( 'after_setup_theme', 'shopping_setup' );
+
+/**
+ * Vô hiệu hóa hoàn toàn sự can thiệp của Polylang vào các bài đăng của LearnPress
+ * Đảm bảo khóa học hiển thị ở tất cả các ngôn ngữ
+ */
+add_filter( 'pll_get_post_types', 'shopping_disable_polylang_lp', 10, 2 );
+function shopping_disable_polylang_lp( $post_types, $is_settings ) {
+    $lp_types = array( 'lp_course', 'lp_lesson', 'lp_quiz', 'lp_question' );
+    foreach ( $lp_types as $type ) {
+        if ( isset( $post_types[ $type ] ) ) {
+            unset( $post_types[ $type ] );
+        }
+    }
+    return $post_types;
+}
+
+/**
+ * Kích hoạt WP REST API (show_in_rest) cho các Custom Post Type của LearnPress
+ * Để NextJS hoặc các ứng dụng Frontend có thể fetch dữ liệu qua /wp-json/wp/v2/lp_course
+ */
+add_filter( 'register_post_type_args', 'shopping_enable_rest_learnpress', 10, 2 );
+function shopping_enable_rest_learnpress( $args, $post_type ) {
+    if ( in_array( $post_type, array( 'lp_course', 'lp_lesson', 'lp_quiz', 'lp_question' ) ) ) {
+        $args['show_in_rest'] = true;
+    }
+    return $args;
+}
+
+/**
+ * Hàm lấy ảnh cực mạnh: Bỏ qua toàn bộ cơ chế chặn của Polylang và RankMath bằng cách truy vấn thẳng vào Database (Raw SQL)
+ */
+function shopping_get_bypass_thumbnail_url( $post_id ) {
+    global $wpdb;
+    
+    // 1. Thử lấy từ Rank Math trước
+    $rm_fb = get_post_meta( $post_id, 'rank_math_facebook_image', true );
+    if ( ! empty( $rm_fb ) ) return $rm_fb;
+    
+    $rm_tw = get_post_meta( $post_id, 'rank_math_twitter_image', true );
+    if ( ! empty( $rm_tw ) ) return $rm_tw;
+
+    // 2. Lấy ID ảnh đại diện thực tế (Bỏ qua filter get_post_meta bị chặn)
+    $thumb_id = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_thumbnail_id'", $post_id ) );
+    if ( $thumb_id ) {
+        // Lấy link gốc từ Database (bỏ qua wp_get_attachment_image bị chặn)
+        $url = $wpdb->get_var( $wpdb->prepare( "SELECT guid FROM {$wpdb->posts} WHERE ID = %d", $thumb_id ) );
+        if ( $url ) return $url;
+    }
+    return '';
+}
 
 /**
  * Enqueue scripts and styles.
@@ -203,17 +257,19 @@ function shopping_e( $string ) {
  * Integrate Tailwind CSS CDN
  */
 function shopping_add_tailwind_cdn() {
+    // Lấy màu từ Customizer do người dùng gán, nếu chưa có thì dùng màu gốc.
+    $primary_color = get_theme_mod('shopping_primary_color', '#ea580c');
     ?>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              primary: '#ea580c', // orange-600
+              primary: '<?php echo esc_js($primary_color); ?>', /* Màu động lấy từ Customizer */
               'primary-hover': '#c2410c', // orange-700
               secondary: '#fff7ed', // orange-50
               accent: '#166534', // green-800
@@ -223,7 +279,7 @@ function shopping_add_tailwind_cdn() {
             },
             fontFamily: {
               base: ['Inter', 'sans-serif'],
-              heading: ['Merriweather', 'serif'],
+              heading: ['Outfit', 'sans-serif'],
             }
           }
         }
@@ -308,6 +364,21 @@ function shopping_customize_register( $wp_customize ) {
         ) ) );
     }
 
+    // Tùy biến Màu Sắc & Font
+    $wp_customize->add_section( 'shopping_theme_colors', array(
+        'title' => __( 'Màu Chủ Đạo', 'shopping' ),
+        'priority' => 30,
+    ) );
+
+    $wp_customize->add_setting( 'shopping_primary_color', array(
+        'default' => '#ea580c',
+        'sanitize_callback' => 'sanitize_hex_color',
+    ) );
+    $wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'shopping_primary_color', array(
+        'label' => __( 'Màu Nhận Diện Thương Hiệu', 'shopping' ),
+        'section' => 'shopping_theme_colors',
+    ) ) );
+
     // Thông tin bản quyền / Đáy trang
     $wp_customize->add_section( 'shopping_footer_bottom', array(
         'title' => __( 'Thông tin Đáy trang', 'shopping' ),
@@ -325,9 +396,96 @@ function shopping_customize_register( $wp_customize ) {
     ) );
 
     $wp_customize->add_setting( 'footer_slogan', array( 'default' => 'DẪN ĐẦU TRONG LĨNH VỰC HÓA CHẤT, THIẾT BỊ CÔNG NGHIỆP & SẢN PHẨM LIÊN QUAN' ) );
+
+    // Cột Thông Tin & Bản Tin
+    $wp_customize->add_section( 'shopping_footer_info_section', array(
+        'title' => __( 'Thông Tin Thêm & Nhận Bản Tin', 'shopping' ),
+        'panel' => 'shopping_footer_options',
+    ) );
+
+    $wp_customize->add_setting( 'footer_info_title', array( 'default' => 'Thông tin' ) );
+    $wp_customize->add_control( 'footer_info_title', array(
+        'label' => 'Tiêu đề cột thông tin', 'section' => 'shopping_footer_info_section', 'type' => 'text',
+    ) );
+
+    $wp_customize->add_setting( 'footer_info_content', array( 'default' => "<ul><li><a href='#'>Về chúng tôi</a></li><li><a href='#'>Chính sách bảo mật</a></li><li><a href='#'>Quy định sử dụng</a></li><li><a href='#'>Thông tin giao hàng</a></li></ul>" ) );
+    $wp_customize->add_control( 'footer_info_content', array(
+        'label' => 'Nội dung HTML cột thông tin', 'section' => 'shopping_footer_info_section', 'type' => 'textarea',
+    ) );
+
+    // Cột Chính sách (Cột mới)
+    $wp_customize->add_setting( 'footer_policy_title', array( 'default' => 'CHÍNH SÁCH' ) );
+    $wp_customize->add_control( 'footer_policy_title', array(
+        'label' => 'Tiêu đề cột Chính sách', 'section' => 'shopping_footer_info_section', 'type' => 'text',
+    ) );
+
+    $wp_customize->add_setting( 'footer_policy_content', array( 'default' => "<ul><li><a href='#'>Chính sách bảo mật</a></li><li><a href='#'>Quy định sử dụng</a></li><li><a href='#'>Thông tin giao hàng</a></li><li><a href='#'>Bảo hành & Đổi trả</a></li></ul>" ) );
+    $wp_customize->add_control( 'footer_policy_content', array(
+        'label' => 'Nội dung HTML cột Chính sách', 'section' => 'shopping_footer_info_section', 'type' => 'textarea',
+    ) );
+
+    $wp_customize->add_setting( 'footer_newsletter_title', array( 'default' => 'NHẬN BẢN TIN' ) );
+    $wp_customize->add_control( 'footer_newsletter_title', array(
+        'label' => 'Tiêu đề Nhận Bản Tin', 'section' => 'shopping_footer_info_section', 'type' => 'text',
+    ) );
+
+    $wp_customize->add_setting( 'footer_newsletter_desc', array( 'default' => 'Đăng ký email để nhanh chóng nhận được các thông báo về khuyến mại, chương trình giảm giá của chúng tôi' ) );
+    $wp_customize->add_control( 'footer_newsletter_desc', array(
+        'label' => 'Mô tả Nhận Bản Tin', 'section' => 'shopping_footer_info_section', 'type' => 'textarea',
+    ) );
 }
 
-// 7. Dịch Thuật Tab Đánh Giá (Reviews) sang Tiếng Việt bằng Hook gettext
+// Dịch thuật các nút bấm của LearnPress sang tiếng Việt
+add_filter( 'gettext', 'shopping_translate_learnpress', 20, 3 );
+function shopping_translate_learnpress( $translated_text, $text, $domain ) {
+    if ( 'learnpress' === $domain || 'shopping' === $domain ) {
+        switch ( $text ) {
+            case 'Start Now':
+                $translated_text = 'Bắt đầu ngay';
+                break;
+            case 'Continue':
+                $translated_text = 'Tiếp tục';
+                break;
+            case 'Enroll':
+            case 'Enroll Now':
+                $translated_text = 'Tham gia khóa học';
+                break;
+        }
+    }
+    return $translated_text;
+}
+
+// --------- ĐÈ BẸP CSS LIST VIEW CỦA LEARNPRESS ĐỂ LUÔN ĐẸP VÀ RỘNG ---------
+add_action( 'wp_head', 'shopping_dynamic_course_layout' );
+function shopping_dynamic_course_layout() {
+    if ( is_post_type_archive( 'lp_course' ) || is_tax( 'course_category' ) || is_tax( 'course_tag' ) ) {
+        ?>
+        <style>
+            /* Ép buộc tất cả ul dù có class lp-list-view hay không đều thành Grid */
+            ul.learn-press-courses {
+                display: grid !important;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+                gap: 2rem !important;
+                width: 100% !important;
+            }
+            ul.learn-press-courses li.course {
+                width: 100% !important;
+                display: flex !important;
+                flex-direction: column !important;
+                margin-bottom: 0 !important;
+            }
+            /* Ẩn nút chuyển đổi Grid/List vì Grid đã hoàn hảo */
+            .lp-courses-bar .courses-switch-view { display: none !important; }
+            
+            /* Mở rộng toàn bộ trang Courses cho rộng rãi */
+            .lp-archive-courses { width: 100% !important; max-width: 1200px !important; margin: 0 auto !important; }
+            #lp-archive-courses { max-width: 100% !important; }
+        </style>
+        <?php
+    }
+}
+
+// Dịch Thuật Tab Đánh Giá (Reviews) sang Tiếng Việt bằng Hook gettext
 add_filter( 'gettext', 'shopping_translate_reviews', 20, 3 );
 function shopping_translate_reviews( $translated_text, $text, $domain ) {
     if ( 'woocommerce' === $domain ) {

@@ -150,18 +150,29 @@ get_header();
 							if ( $latest_products->have_posts() ) :
 								while ( $latest_products->have_posts() ) : $latest_products->the_post();
 									?>
-									<div class="flex gap-4 items-start">
-										<a href="<?php the_permalink(); ?>" class="shrink-0">
+									<div class="flex gap-4 items-center">
+										<a href="<?php the_permalink(); ?>" class="shrink-0 rounded-lg overflow-hidden border border-gray-100 shadow-sm block relative group">
 											<?php 
 											if ( has_post_thumbnail() ) {
-												the_post_thumbnail('thumbnail', array('class' => 'w-16 h-16 object-cover border border-gray-100 p-1'));
+												the_post_thumbnail('thumbnail', array('class' => 'w-20 h-20 object-cover group-hover:scale-105 transition-transform duration-300'));
 											} else {
-												echo '<div class="w-16 h-16 bg-gray-100 flex items-center justify-center text-[10px] text-gray-400 border border-gray-200 p-1">No Img</div>';
+												echo '<div class="w-20 h-20 bg-gray-50 flex items-center justify-center text-[10px] text-gray-400">No Img</div>';
 											}
 											?>
 										</a>
-										<div>
-											<h4 class="text-[13px] font-bold uppercase text-dark leading-tight hover:text-primary transition-colors"><a href="<?php the_permalink(); ?>"><?php echo wp_trim_words( get_the_title(), 12, '...' ); ?></a></h4>
+										<div class="flex-1 flex flex-col justify-center">
+											<h4 class="text-[13px] font-bold text-dark leading-snug mb-1.5 hover:text-primary transition-colors"><a href="<?php the_permalink(); ?>"><?php echo wp_trim_words( get_the_title(), 10, '...' ); ?></a></h4>
+											<?php 
+											global $product;
+											if ( $product ) :
+											?>
+											<div class="text-primary font-bold text-[14px] flex items-center gap-1.5 [&>del]:text-[11px] [&>del]:text-gray-400 [&>del]:font-normal [&>ins]:no-underline [&>ins]:text-primary">
+												<?php 
+												$price = $product->get_price();
+												echo (empty($price) || $price == 0) ? 'Liên hệ' : $product->get_price_html(); 
+												?>
+											</div>
+											<?php endif; ?>
 										</div>
 									</div>
 									<?php

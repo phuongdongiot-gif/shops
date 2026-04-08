@@ -14,19 +14,22 @@ Tags: e-commerce, custom-background, custom-colors, custom-logo, custom-menu, fe
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
-
-/* Base System Resets */
+/* Các luật liên quan đến .bg-primary cũng không cần ở đây nữa vì đã có trong JS nhưng lỡ có file compile cũ thì giữ lại base: */
 body {
-  font-family: 'Inter', sans-serif;
+  font-size: 15px; /* Nhỏ lại một chút tổng thể */
   color: #4B5563;
-  background-color: #F9FAFB;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Outfit', sans-serif;
   color: #111827;
+  font-weight: 600; /* Nhẹ nhàng, mềm mại hơn, không bị cục mịch (dày cộp) */
+  line-height: 1.3;
 }
+h1 { font-size: 2rem; line-height: 1.2; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1.125rem; }
+p { line-height: 1.6; }
 
 /* Base WooCommerce Overrides to make it look premium */
 .woocommerce ul.products, 
