@@ -25,14 +25,14 @@
 				<div class="text-left">
 					<h4 class="text-lg font-bold text-[#ffeb3b] mb-4 uppercase"><?php echo esc_html(get_theme_mod('footer_policy_title', 'CHÍNH SÁCH')); ?></h4>
 					<div class="text-gray-300 [&>ul>li]:mb-3 [&>ul>li>a:hover]:text-[#ffeb3b] [&>ul>li>a]:transition-colors [&>ul>li>a]:underline-offset-4 [&>ul>li>a:hover]:underline">
-						<?php echo wp_kses_post(get_theme_mod('footer_policy_content', "<ul><li><a href='#'>Chính sách bảo mật</a></li><li><a href='#'>Quy định sử dụng</a></li><li><a href='#'>Thông tin giao hàng</a></li><li><a href='#'>Bảo hành & Đổi trả</a></li></ul>")); ?>
+						<?php echo wp_kses_post(get_theme_mod('footer_policy_content', "<ul><li><a href='#'>Chính sách bảo mật</a></li><li><a href='#'>Quy định sử dụng</a></li><li><a href='#'>Hướng dẫn yêu cầu tư vấn</a></li><li><a href='#'>Bảo hành & Bảo trì</a></li></ul>")); ?>
 					</div>
 				</div>
 
 				<!-- Cột Nhận bản tin -->
 				<div class="text-left">
 					<h4 class="text-lg font-bold text-[#ffeb3b] mb-4 uppercase"><?php echo esc_html(get_theme_mod('footer_newsletter_title', 'NHẬN BẢN TIN')); ?></h4>
-					<p class="mb-4 text-gray-300"><?php echo esc_html(get_theme_mod('footer_newsletter_desc', 'Đăng ký email để nhanh chóng nhận được các thông báo về khuyến mại, chương trình giảm giá của chúng tôi')); ?></p>
+					<p class="mb-4 text-gray-300"><?php echo esc_html(get_theme_mod('footer_newsletter_desc', 'Đăng ký email để nhanh chóng nhận được các thông báo về dịch vụ và chương trình hỗ trợ của chúng tôi')); ?></p>
 					<form action="#" method="post" class="flex mt-2">
 						<input type="email" placeholder="Nhập email tại đây..." class="w-full px-4 py-2.5 text-gray-800 rounded-l-md border-none focus:ring-2 focus:ring-[#ffeb3b] outline-none">
 						<button type="submit" class="bg-primary hover:bg-primary-hover border border-primary text-white px-5 py-2.5 rounded-r-md font-bold transition-colors">Gửi</button>
@@ -43,7 +43,7 @@
 			<!-- LINE NGANG VÀ LINK DƯỚI CÙNG -->
 			<div class="text-center space-y-6">
 				<!-- Footer Links -->
-				<?php $footer_links = get_theme_mod('footer_links', 'Hướng dẫn mua online | Chính sách giao hàng | Bảo hành & đổi trả sản phẩm | Chính sách bảo mật | Cam kết chất lượng sản phẩm | Khách hàng chia sẻ'); ?>
+				<?php $footer_links = get_theme_mod('footer_links', 'Hướng dẫn gửi tư vấn | Chính sách hỗ trợ | Bảo hành & bảo trì sản phẩm | Chính sách bảo mật | Cam kết chất lượng dịch vụ | Khách hàng chia sẻ'); ?>
 				<div class="text-[14px] font-bold text-white uppercase tracking-wide">
 					<?php echo wp_kses_post($footer_links); ?>
 				</div>
@@ -71,6 +71,8 @@
 		</div><!-- .container -->
 	</footer><!-- #colophon -->
 </div><!-- #page -->
+
+<?php get_template_part( 'template-parts/offcanvas-cart' ); ?>
 
 <?php wp_footer(); ?>
 

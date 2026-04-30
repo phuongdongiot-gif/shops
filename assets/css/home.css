@@ -1,0 +1,73 @@
+/* ==============================================================
+   HOME PAGE STYLES (Trang chủ)
+   ============================================================== */
+
+/* --- 1. Hero Slider --- */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0px); }
+}
+.heroSwiper .swiper-pagination-bullet-active {
+    background: #ea580c !important;
+}
+.heroSwiper .swiper-pagination {
+    bottom: 20px !important;
+}
+
+/* --- 2. Category Carousel --- */
+.category-swiper-pagination .swiper-pagination-bullet {
+    background: #d1d5db;
+    opacity: 1;
+    margin: 0 4px !important;
+}
+.category-swiper-pagination .swiper-pagination-bullet-active {
+    background: #ea580c;
+    width: 24px;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* --- 3. Stacked Categories Collapse Animation --- */
+.category-grid-content.is-collapsed {
+    grid-template-rows: 0fr !important;
+}
+.category-grid-content.is-collapsed .grid-inner-wrapper {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
+.category-grid-content:not(.is-collapsed) .grid-inner-wrapper {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.5s 0.2s, visibility 0.5s 0.2s;
+}
+
+/* --- 4. Brands Marquee Animation --- */
+@keyframes brandscroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-240px * 5)); }
+}
+.slider-track {
+    animation: brandscroll 25s linear infinite;
+    display: flex;
+    width: max-content;
+}
+.slide-logo {
+    width: 240px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.slide-logo img {
+    max-width: 154px;
+    max-height: 64px;
+    object-fit: contain;
+    filter: grayscale(100%) opacity(0.5);
+    transition: all 0.4s;
+}
+.slide-logo:hover img {
+    filter: grayscale(0) opacity(1);
+    transform: scale(1.1);
+}

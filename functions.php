@@ -8,6 +8,10 @@ if ( ! defined( '_S_VERSION' ) ) {
 	define( '_S_VERSION', '1.0.0' );
 }
 
+// Require Custom Assets
+require_once get_template_directory() . '/inc/enqueue-assets.php';
+require_once get_template_directory() . '/inc/branches-cpt.php';
+
 /**
  * Sets up theme defaults and registers support for various WordPress features.
  */
@@ -651,8 +655,8 @@ add_action( 'customize_register', 'shopping_customize_register' );
  * ==========================================
  */
 
-// 1. Tắt khả năng mua hàng nếu giá bằng 0 (Ngăn chặn thanh toán 0 đồng) HOẶC Tắt toàn bộ giỏ hàng (Chế độ Catalog)
-add_filter( 'woocommerce_is_purchasable', '__return_false' );
+// 1. Mở lại cơ chế mua hàng để có thể thêm vào danh sách tư vấn (Kể cả giá 0đ)
+add_filter( 'woocommerce_is_purchasable', '__return_true' );
 
 // 2. Chuyển đổi hiển thị giá 0đ thành chữ "Liên hệ" ở mọi trang
 add_filter( 'woocommerce_get_price_html', 'shopping_zero_price_html', 100, 2 );
@@ -663,26 +667,32 @@ function shopping_zero_price_html( $price, $product ) {
     return $price;
 }
 
-// 3. Thay đổi nút Add to Cart ngoài vòng lặp (Trang danh mục/Shop) thành nút Liên hệ hoặc Xem chi tiết
-add_filter( 'woocommerce_loop_add_to_cart_link', 'shopping_zero_price_contact_button', 10, 3 );
-function shopping_zero_price_contact_button( $button, $product, $args = array() ) {
-    if ( empty( $product->get_price() ) || $product->get_price() == 0 ) {
-        $phone = get_theme_mod( 'topbar_phone', '0947 464 464' );
-        $tel = str_replace( array(' ', '.', '-'), '', $phone );
-        
-        $button = sprintf(
-            '<a href="tel:%s" class="button block w-full text-center py-2.5 rounded-lg font-semibold transition-all duration-300 text-white bg-primary hover:bg-primary-hover mt-auto">%s</a>',
-            esc_attr( $tel ),
-            esc_html__( 'Liên hệ ngay', 'shopping' )
-        );
-    } else {
-        // Tạm thời bỏ giỏ hàng => biến thành nút xem chi tiết
-        $button = sprintf(
-            '<a href="%s" class="button block w-full text-center py-2.5 rounded-lg font-semibold transition-all duration-300 text-primary bg-secondary border border-primary/20 hover:bg-primary hover:text-white mt-auto">%s</a>',
-            esc_url( $product->get_permalink() ),
-            esc_html__( 'Xem chi tiết', 'shopping' )
-        );
+// 3. Thay đổi nút Add to Cart ngoài vòng lặp thành Icon Danh Sách Tư Vấn
+add_filter( 'woocommerce_loop_add_to_cart_link', 'shopping_add_to_list_icon_button', 10, 3 );
+function shopping_add_to_list_icon_button( $button, $product, $args = array() ) {
+    $icon = '<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>';
+    
+    $classes = isset( $args['class'] ) ? $args['class'] : 'button';
+    // Thêm class bắt buộc để AJAX WooCommerce lấy dữ liệu Add To Cart không load lại trang
+    if ( $product->is_purchasable() && $product->supports( 'ajax_add_to_cart' ) ) {
+        $classes .= ' add_to_cart_button ajax_add_to_cart product_type_' . $product->get_type();
     }
+    
+    // Nút thiết kế dạng Icon vuông tròn thả trôi
+    $custom_class = 'flex items-center justify-center w-10 h-10 rounded-full bg-orange-50 text-primary hover:bg-primary hover:text-white transition-colors custom-add-list-btn mx-auto mt-auto';
+
+    $button = sprintf(
+        '<a href="%s" data-quantity="%s" class="%s %s" %s data-product_id="%s" title="%s">%s</a>',
+        esc_url( $product->add_to_cart_url() ),
+        esc_attr( isset( $args['quantity'] ) ? $args['quantity'] : 1 ),
+        esc_attr( $classes ),
+        esc_attr( $custom_class ),
+        isset( $args['attributes'] ) ? wc_implode_html_attributes( $args['attributes'] ) : '',
+        esc_attr( $product->get_id() ),
+        esc_attr__( 'Thêm vào danh sách', 'shopping' ),
+        $icon
+    );
+
     return $button;
 }
 
@@ -701,3 +711,513 @@ function shopping_zero_price_single_contact() {
         );
     }
 }
+
+// =========================================================
+// MỤC LỤC TỰ ĐỘNG CHO BÀI VIẾT (TABLE OF CONTENTS)
+// =========================================================
+add_filter( 'the_content', 'shopping_auto_toc' );
+function shopping_auto_toc( $content ) {
+    // Chỉ áp dụng cho trang chi tiết bài viết (Single Post), nằm trong vòng lặp chính
+    if ( ! is_singular( 'post' ) || ! in_the_loop() || ! is_main_query() ) {
+        return $content;
+    }
+
+    // Đếm số heading H2 và H3 (hỗ trợ tiếng Việt và các định dạng)
+    preg_match_all('/<h([2-3])([^>]*)>(.*?)<\/h\1>/si', $content, $matches, PREG_SET_ORDER);
+    if ( count( $matches ) < 2 ) {
+        // Phải có ít nhất 2 heading mới tạo mục lục
+        return $content;
+    }
+
+    // Cấu trúc box Mục Lục (nổi bật, bo góc đẹp, style Tailwind)
+    $toc = '<div class="shopping-toc bg-[#f8fafc] border border-gray-200 rounded-xl p-5 mb-10 mt-4 shadow-[0_2px_10px_rgb(0,0,0,0.03)] w-full block box-border">';
+    $toc .= '<div class="toc-header flex justify-between items-center cursor-pointer select-none" onclick="document.getElementById(\'shopping-toc-list\').classList.toggle(\'hidden\'); document.getElementById(\'toc-icon\').classList.toggle(\'rotate-180\');">';
+    $toc .= '<h3 class="text-[17px] font-heading font-bold text-dark m-0 flex items-center gap-2 uppercase tracking-wide">';
+    $toc .= '<svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>';
+    $toc .= 'Mục Lục Bài Viết';
+    $toc .= '</h3>';
+    $toc .= '<svg id="toc-icon" class="w-5 h-5 text-gray-500 transition-transform duration-300 transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>';
+    $toc .= '</div>';
+    
+    // Danh sách các mục
+    $toc .= '<ul id="shopping-toc-list" class="space-y-3 text-[15px] list-none pl-0 m-0 mt-5 transition-all duration-300 ease-in-out">';
+    
+    $counter2 = 0;
+    $counter3 = 0;
+    
+    // Sử dụng biến cục bộ để pass vào closure
+    $GLOBALS['shopping_toc_index'] = 0;
+    $GLOBALS['shopping_toc_items'] = array();
+
+    // Callback thay thế heading cũ bằng heading mới gắn ID
+    $content = preg_replace_callback( '/<h([2-3])([^>]*)>(.*?)<\/h\1>/svi', function( $match ) use ( &$counter2, &$counter3 ) {
+        $level = $match[1];
+        $attributes = $match[2];
+        $text = strip_tags($match[3]);
+        $text_clean = html_entity_decode( $text, ENT_QUOTES, 'UTF-8' );
+        
+        // Tạo ID slug cho heading
+        $slug = sanitize_title( $text_clean );
+        if ( empty($slug) ) {
+            $slug = 'section-' . $GLOBALS['shopping_toc_index'];
+        }
+        // Thêm index để đảm bảo slug là duy nhất
+        $slug .= '-' . $GLOBALS['shopping_toc_index'];
+
+        if ( $level == '2' ) {
+            $counter2++;
+            $counter3 = 0;
+            $num = $counter2;
+        } else {
+            $counter3++;
+            $num = $counter2 . '.' . $counter3;
+        }
+
+        $GLOBALS['shopping_toc_items'][] = array(
+            'level' => $level,
+            'title' => trim( $match[3] ), // Giữ lại cả định dạng HTML nhẹ trong title (như b, i)
+            'slug'  => $slug,
+            'num'   => $num
+        );
+
+        $GLOBALS['shopping_toc_index']++;
+
+        // Trả về heading mới (thêm scroll-mt-24 để bù trừ fixed header nếu có)
+        return sprintf( '<h%1$s%2$s id="%3$s" style="scroll-margin-top: 100px;">%4$s</h%1$s>', $level, $attributes, $slug, $match[3] );
+    }, $content );
+
+    // Render HTML cho từng mục
+    foreach ( $GLOBALS['shopping_toc_items'] as $item ) {
+        $is_h3 = ($item['level'] == '3');
+        $padding = $is_h3 ? 'pl-6 text-[14px] text-gray-600' : 'font-semibold text-gray-800';
+        $border_top = ( !$is_h3 && $item['num'] !== 1 ) ? 'pt-3 mt-3 border-t border-gray-200/60' : '';
+        
+        $toc .= '<li class="' . $padding . ' ' . $border_top . ' leading-snug">';
+        $toc .= '<a href="#' . $item['slug'] . '" class="flex items-start gap-2.5 no-underline hover:text-primary transition-colors group">';
+        $toc .= '<span class="text-primary/90 shrink-0 font-bold group-hover:text-primary">' . $item['num'] . '.</span>';
+        $toc .= '<span class="flex-1">' . strip_tags($item['title']) . '</span>';
+        $toc .= '</a>';
+        $toc .= '</li>';
+    }
+
+    $toc .= '</ul>';
+    
+    // Styles mượt mà CSS
+    $toc .= '<style>html { scroll-behavior: smooth; }</style>';
+    
+    $toc .= '</div>';
+
+    // Xóa biến global tránh xung đột
+    unset( $GLOBALS['shopping_toc_index'], $GLOBALS['shopping_toc_items'] );
+
+    // Thêm mục lục vào ngay đầu bài viết
+    return $toc . $content;
+}
+
+// =========================================================
+// FLOATING ACTION BUTTONS & STICKY MOBILE BAR
+// =========================================================
+
+// Thêm cấu hình Zalo, Messenger vào Customizer
+add_action( 'customize_register', 'shopping_floating_contact_customize' );
+function shopping_floating_contact_customize( $wp_customize ) {
+    $wp_customize->add_section( 'shopping_floating_contact_section', array(
+        'title' => __( 'Nút Liên Hệ (Zalo/Messenger)', 'shopping' ),
+        'priority' => 35,
+    ) );
+
+    $wp_customize->add_setting( 'contact_zalo', array( 'default' => 'https://zalo.me/0799036842' ) );
+    $wp_customize->add_control( 'contact_zalo', array(
+        'label' => 'Link Zalo (VD: https://zalo.me/0799036842)',
+        'section' => 'shopping_floating_contact_section',
+        'type' => 'text',
+    ) );
+
+    $wp_customize->add_setting( 'contact_messenger', array( 'default' => 'https://m.me/yourfanpage' ) );
+    $wp_customize->add_control( 'contact_messenger', array(
+        'label' => 'Link Messenger (VD: https://m.me/abc)',
+        'section' => 'shopping_floating_contact_section',
+        'type' => 'text',
+    ) );
+
+    // Khối Đặc quyền (Lợi ích) Trang Chủ
+    $wp_customize->add_section( 'shopping_home_benefits_section', array(
+        'title' => __( 'Trang Chủ - 3 Lợi ích', 'shopping' ),
+        'priority' => 36,
+    ) );
+
+    for ($i = 1; $i <= 3; $i++) {
+        $defaults = [
+            1 => ['Chất Lượng Cao Cấp', 'Từng sản phẩm đều được kiểm định khắt khe và đạt chuẩn.'],
+            2 => ['Thanh Toán An Toàn', 'Hệ thống bảo mật thông tin tuyệt đối qua mã hóa.'],
+            3 => ['Giao Hàng Nhanh', 'Xử lý đơn linh hoạt, giao hàng siêu tốc toàn quốc.']
+        ];
+        
+        $wp_customize->add_setting( 'home_benefit_' . $i . '_title', array( 'default' => $defaults[$i][0] ) );
+        $wp_customize->add_control( 'home_benefit_' . $i . '_title', array(
+            'label' => 'Lợi ích ' . $i . ' - Tiêu đề',
+            'section' => 'shopping_home_benefits_section',
+            'type' => 'text',
+        ) );
+
+        $wp_customize->add_setting( 'home_benefit_' . $i . '_desc', array( 'default' => $defaults[$i][1] ) );
+        $wp_customize->add_control( 'home_benefit_' . $i . '_desc', array(
+            'label' => 'Lợi ích ' . $i . ' - Mô tả',
+            'section' => 'shopping_home_benefits_section',
+            'type' => 'textarea',
+        ) );
+    }
+}
+
+// In mã HTML vào Footer
+add_action( 'wp_footer', 'shopping_floating_action_buttons', 99 );
+function shopping_floating_action_buttons() {
+    $phone = get_theme_mod( 'topbar_phone', '0947 464 464' );
+    $tel = str_replace( array(' ', '.', '-'), '', $phone );
+    $zalo = get_theme_mod( 'contact_zalo', 'https://zalo.me/0947464464' );
+    $messenger = get_theme_mod( 'contact_messenger', 'https://m.me/yourfanpage' );
+    
+    ?>
+    <style>
+        /* Floating Buttons CSS */
+        .fab-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 14px; align-items: flex-end; }
+        .fab-btn { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: all 0.3s; position: relative; text-decoration: none; }
+        .fab-btn:hover { transform: translateY(-4px); }
+        .fab-zalo { background-color: #0068ff; }
+        .fab-mess { background-color: #0084ff; }
+        .fab-phone { background-color: #ef4444; background: linear-gradient(135deg, #ef4444, #dc2626); animation: pulse-ring 2s infinite; }
+        .fab-btn svg { width: 24px; height: 24px; fill: white; object-fit: contain; }
+        
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* Sticky Mobile Bar */
+        .sticky-mobile-bar {
+            display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; z-index: 9998;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.08); padding: 10px 12px;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+        }
+        @media (max-width: 767px) {
+            .sticky-mobile-bar.active { display: flex; gap: 10px; }
+            .fab-container { bottom: 85px; right: 16px; transform: scale(0.9); transform-origin: bottom right; } /* Lift up so it doesnt overlap sticky bar */
+        }
+    </style>
+
+    <!-- Floating Buttons (Zalo, Messenger, Call) -->
+    <div class="fab-container">
+        <?php if ($messenger) : ?>
+        <a href="<?php echo esc_url($messenger); ?>" target="_blank" rel="noopener" class="fab-btn fab-mess" title="Messenger">
+            <svg viewBox="0 0 36 36"><path d="M18 2C9.16 2 2 8.7 2 17c0 4.67 2.3 8.85 5.8 11.66V34l5.31-2.92c1.55.43 3.18.66 4.89.66 8.84 0 16-6.7 16-15S26.84 2 18 2zm1.63 20.12l-4.13-4.4-8.06 4.4 8.82-9.39 4.14 4.4 8.05-4.4-8.82 9.39z"/></svg>
+        </a>
+        <?php endif; ?>
+        
+        <?php if ($zalo) : ?>
+        <a href="<?php echo esc_url($zalo); ?>" target="_blank" rel="noopener" class="fab-btn fab-zalo" title="Zalo" style="color: white; font-family: sans-serif; font-weight: bold; font-size: 14px;">
+            Zalo
+        </a>
+        <?php endif; ?>
+
+        <a href="tel:<?php echo esc_attr($tel); ?>" class="fab-btn fab-phone" title="Gọi Ngay" style="color: white;">
+            <svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56M16.48 14.82c-.38-.13-.81-.05-1.07.2l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1.03M7.22 8.52C6.86 7.41 6.66 6.22 6.66 4.99M6.66 4.99h-3.4M20.01 15.38v3.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+    </div>
+
+    <!-- Sticky Bottom Bar for Mobile (Products Only) -->
+    <?php if ( function_exists('is_product') && is_product() ) : ?>
+    <div class="sticky-mobile-bar active">
+        <a href="tel:<?php echo esc_attr($tel); ?>" class="flex-1 bg-[#f3f4f6] text-gray-800 text-center py-2.5 rounded-lg border border-gray-200 font-bold flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors">
+            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+            Gọi Ngay
+        </a>
+        <a href="<?php echo esc_url($zalo ? $zalo : ($messenger ? $messenger : 'tel:'.$tel)); ?>" target="_blank" rel="noopener" class="flex-1 bg-[#ea580c] text-white text-center py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 shadow-sm hover:opacity-90 transition-opacity">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+            Chat Tư Vấn
+        </a>
+    </div>
+    <?php endif; ?>
+    <?php
+}
+
+// =========================================================
+// CUSTOM POST TYPE: ĐỐI TÁC & KHÁCH HÀNG
+// =========================================================
+add_action( 'init', 'shopping_register_partner_cpt' );
+function shopping_register_partner_cpt() {
+    // 1. Đăng ký Taxonomy (Danh mục)
+    register_taxonomy(
+        'partner_group',
+        'shopping_partner',
+        array(
+            'label' => __( 'Nhóm (Đối tác/Khách hàng)', 'shopping' ),
+            'rewrite' => array( 'slug' => 'partner_group' ),
+            'hierarchical' => true,
+            'show_admin_column' => true,
+        )
+    );
+
+    // 2. Đăng ký Custom Post Type
+    register_post_type( 'shopping_partner',
+        array(
+            'labels' => array(
+                'name' => __( 'KH & Đối Tác', 'shopping' ),
+                'singular_name' => __( 'Khách hàng / Đối tác', 'shopping' ),
+                'add_new' => __( 'Thêm mới', 'shopping' ),
+                'add_new_item' => __( 'Thêm mới', 'shopping' ),
+                'edit_item' => __( 'Sửa', 'shopping' ),
+            ),
+            'public' => true,
+            'publicly_queryable' => false, // Chỉ hiển thị query, ko cần trang chi tiết
+            'show_ui' => true,
+            'has_archive' => false,
+            'menu_icon' => 'dashicons-groups',
+            'supports' => array( 'title', 'editor', 'thumbnail', 'excerpt' ),
+            'taxonomies' => array( 'partner_group' )
+        )
+    );
+}
+
+// Gợi ý cho Meta Box (Trích dẫn dùng làm Chức vụ)
+add_action('admin_head', 'shopping_partner_custom_css');
+function shopping_partner_custom_css() {
+    global $post_type;
+    if ($post_type == 'shopping_partner') {
+        echo '<style>
+            #postexcerpt .hndle span { content: "Chức vụ / Công ty (Dành cho Ý kiến Khách hàng)"; font-size:0; }
+            #postexcerpt .hndle span:after { content: "Chức vụ / Công ty (Nhập chức vụ vào phần Tóm tắt này)"; font-size:14px; }
+            #postimagediv .hndle span:after { content: " (Dùng Logo cho Đối tác, Avatar cho Khách hàng)"; font-size:12px; font-weight:normal; }
+        </style>';
+    }
+}
+
+// =========================================================
+// AJAX LIVE SEARCH (ƯU TIÊN SẢN PHẨM)
+// =========================================================
+
+add_action('wp_ajax_shopping_live_search', 'shopping_ajax_live_search');
+add_action('wp_ajax_nopriv_shopping_live_search', 'shopping_ajax_live_search');
+
+function shopping_ajax_live_search() {
+    // Kiểm tra keyword
+    $keyword = isset($_REQUEST['keyword']) ? sanitize_text_field($_REQUEST['keyword']) : '';
+    if ( strlen($keyword) < 2 ) {
+        wp_send_json_success(array('html' => ''));
+    }
+
+    $args = array(
+        's'              => $keyword,
+        'post_type'      => class_exists('WooCommerce') ? 'product' : 'post',
+        'post_status'    => 'publish',
+        'posts_per_page' => 5,
+    );
+
+    $search_query = new WP_Query($args);
+    $html = '';
+
+    if ( $search_query->have_posts() ) {
+        while ( $search_query->have_posts() ) {
+            $search_query->the_post();
+            global $product;
+            
+            $price_html = '';
+            if ( class_exists('WooCommerce') && $product ) {
+                $price = $product->get_price();
+                if ( empty($price) || $price == 0 ) {
+                    $price_html = '<span class="text-red-500 font-bold text-[12px]">Liên hệ</span>';
+                } else {
+                    $price_html = '<span class="text-primary font-bold text-[13px]">' . $product->get_price_html() . '</span>';
+                }
+            }
+            
+            $thumb = has_post_thumbnail() ? get_the_post_thumbnail_url(get_the_ID(), 'thumbnail') : (function_exists('wc_placeholder_img_src') ? wc_placeholder_img_src() : '');
+            if (!$thumb) $thumb = 'https://ui-avatars.com/api/?name=' . urlencode(get_the_title()) . '&background=f3f4f6&color=9ca3af';
+
+            $html .= '<li class="border-b border-gray-50 last:border-0">';
+            $html .= '<a href="' . esc_url(get_permalink()) . '" class="flex items-center gap-3 p-3 hover:bg-orange-50 transition-colors group">';
+            $html .= '<img src="' . esc_url($thumb) . '" class="w-10 h-10 object-cover rounded shadow-[0_2px_8px_rgb(0,0,0,0.05)] shrink-0 border border-gray-100" alt="">';
+            $html .= '<div class="flex-1 min-w-0 flex flex-col justify-center">';
+            $html .= '<h4 class="text-[13px] font-bold text-dark group-hover:text-primary truncate mb-0.5 leading-tight">' . get_the_title() . '</h4>';
+            $html .= '<div class="[&>del]:text-[10px] [&>del]:text-gray-400 [&>del]:font-normal [&>ins]:no-underline">' . $price_html . '</div>';
+            $html .= '</div>';
+            $html .= '</a></li>';
+        }
+    } else {
+        $html .= '<li class="p-5 text-center text-[13px] text-gray-500 font-semibold">' . esc_html__('Không tìm thấy kết quả nào trùng khớp!', 'shopping') . '</li>';
+    }
+
+    wp_reset_postdata();
+
+    wp_send_json_success(array('html' => $html));
+}
+
+// Nhúng file JS xử lý Live Search
+add_action( 'wp_footer', 'shopping_live_search_script', 100 );
+function shopping_live_search_script() {
+    ?>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('live-search-input');
+        const resultsContainer = document.getElementById('live-search-results');
+        const resultsList = resultsContainer ? resultsContainer.querySelector('.results-list') : null;
+        const loader = resultsContainer ? resultsContainer.querySelector('.loading-indicator') : null;
+        const viewAllBtn = document.getElementById('view-all-results');
+        let searchTimeout;
+
+        if (!searchInput || !resultsContainer) return;
+
+        // Xử lý khi gõ phím
+        searchInput.addEventListener('input', function(e) {
+            const keyword = this.value.trim();
+            
+            clearTimeout(searchTimeout);
+
+            if (keyword.length < 2) {
+                // Ẩn kết quả nếu chưa đủ chữ
+                resultsContainer.classList.add('hidden', 'opacity-0', 'scale-y-95');
+                resultsContainer.classList.remove('flex');
+                return;
+            }
+
+            // Hiển thị dropdown và loading
+            resultsContainer.classList.remove('hidden', 'opacity-0', 'scale-y-95');
+            resultsContainer.classList.add('flex', 'opacity-100', 'scale-y-100');
+            resultsList.innerHTML = '';
+            loader.classList.remove('hidden');
+            viewAllBtn.classList.add('hidden');
+
+            searchTimeout = setTimeout(function() {
+                const url = '<?php echo admin_url('admin-ajax.php'); ?>?action=shopping_live_search&keyword=' + encodeURIComponent(keyword);
+                
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        loader.classList.add('hidden');
+                        if (data.success && data.data.html !== '') {
+                            resultsList.innerHTML = data.data.html;
+                            if (resultsList.innerHTML.indexOf('Không tìm thấy') === -1) {
+                                viewAllBtn.classList.remove('hidden');
+                                viewAllBtn.href = '<?php echo home_url('/'); ?>?s=' + encodeURIComponent(keyword) + '<?php echo class_exists('WooCommerce') ? '&post_type=product' : ''; ?>';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Lỗi tìm kiếm:', error);
+                        loader.classList.add('hidden');
+                    });
+            }, 500); // Đợi 500ms sau khi ngừng gõ
+        });
+
+        // Ẩn khi click ra ngoài
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.live-search-container')) {
+                resultsContainer.classList.add('hidden', 'opacity-0', 'scale-y-95');
+                resultsContainer.classList.remove('flex');
+            }
+        });
+        
+        // Hiện lại list khi focus
+        searchInput.addEventListener('focus', function() {
+            if (this.value.trim().length >= 2 && resultsList.innerHTML.trim() !== '') {
+                resultsContainer.classList.remove('hidden', 'opacity-0', 'scale-y-95');
+                resultsContainer.classList.add('flex', 'opacity-100', 'scale-y-100');
+            }
+        });
+    });
+        });
+    });
+    </script>
+    <?php
+}
+
+// =========================================================
+// WOOCOMMERCE: CUSTOM LOGIC
+// =========================================================
+if ( class_exists('WooCommerce') ) {
+    require_once get_template_directory() . '/inc/woocommerce-custom.php';
+}
+
+/**
+ * Customizer settings cho Banners (Trang chủ)
+ */
+function shopping_hero_customize_register( $wp_customize ) {
+    $wp_customize->add_section( 'shopping_hero_section', array(
+        'title' => __( 'Cấu hình Banner Trang Chủ', 'shopping' ),
+        'priority' => 30,
+    ) );
+
+    // Slide 1
+    $wp_customize->add_setting( 'hero_img_1', array( 'default' => 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?auto=format&fit=crop&w=1920&q=80' ) );
+    $wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, 'hero_img_1', array(
+        'label' => 'Hình ảnh Banner 1', 'section' => 'shopping_hero_section', 'settings' => 'hero_img_1',
+    ) ) );
+
+    $wp_customize->add_setting( 'hero_title_1', array( 'default' => 'Trải Nghiệm Dịch Vụ Hoàn Hảo' ) );
+    $wp_customize->add_control( 'hero_title_1', array(
+        'label' => 'Tiêu đề Banner 1', 'section' => 'shopping_hero_section', 'type' => 'text',
+    ) );
+
+    $wp_customize->add_setting( 'hero_desc_1', array( 'default' => 'Khám phá bộ sưu tập cao cấp với chất lượng tuyệt hảo, mang đến giá trị đích thực cho cuộc sống.' ) );
+    $wp_customize->add_control( 'hero_desc_1', array(
+        'label' => 'Mô tả Banner 1', 'section' => 'shopping_hero_section', 'type' => 'textarea',
+    ) );
+
+    $wp_customize->add_setting( 'hero_btn_text_1', array( 'default' => 'Yêu Cầu Tư Vấn' ) );
+    $wp_customize->add_control( 'hero_btn_text_1', array(
+        'label' => 'Chữ nút bấm 1', 'section' => 'shopping_hero_section', 'type' => 'text',
+    ) );
+
+    $wp_customize->add_setting( 'hero_btn_link_1', array( 'default' => '#' ) );
+    $wp_customize->add_control( 'hero_btn_link_1', array(
+        'label' => 'Link nút bấm 1', 'section' => 'shopping_hero_section', 'type' => 'url',
+    ) );
+
+    // Slide 2
+    $wp_customize->add_setting( 'hero_img_2', array( 'default' => 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=1920&q=80' ) );
+    $wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, 'hero_img_2', array(
+        'label' => 'Hình ảnh Banner 2', 'section' => 'shopping_hero_section', 'settings' => 'hero_img_2',
+    ) ) );
+
+    $wp_customize->add_setting( 'hero_title_2', array( 'default' => 'Hương Vị Đồng Quê Đích Thực' ) );
+    $wp_customize->add_control( 'hero_title_2', array(
+        'label' => 'Tiêu đề Banner 2', 'section' => 'shopping_hero_section', 'type' => 'text',
+    ) );
+
+    $wp_customize->add_setting( 'hero_desc_2', array( 'default' => 'Chiết xuất hữu cơ từ thiên nhiên, đem lại hương vị đậm đà và an toàn tuyệt đối cho mọi bữa ăn gia đình.' ) );
+    $wp_customize->add_control( 'hero_desc_2', array(
+        'label' => 'Mô tả Banner 2', 'section' => 'shopping_hero_section', 'type' => 'textarea',
+    ) );
+
+    $wp_customize->add_setting( 'hero_btn_text_2', array( 'default' => 'Tìm hiểu chi tiết' ) );
+    $wp_customize->add_control( 'hero_btn_text_2', array(
+        'label' => 'Chữ nút bấm 2', 'section' => 'shopping_hero_section', 'type' => 'text',
+    ) );
+
+    $wp_customize->add_setting( 'hero_btn_link_2', array( 'default' => '#' ) );
+    $wp_customize->add_control( 'hero_btn_link_2', array(
+        'label' => 'Link nút bấm 2', 'section' => 'shopping_hero_section', 'type' => 'url',
+    ) );
+}
+add_action( 'customize_register', 'shopping_hero_customize_register' );
+
+add_action('rest_api_init', function () {
+    $meta_keys = [
+        'rank_math_title',
+        'rank_math_description',
+        'rank_math_focus_keyword',
+        'rank_math_robots'
+    ];
+    foreach ($meta_keys as $meta_key) {
+        register_meta('post', $meta_key, [
+            'type'         => 'string',
+            'single'       => true,
+            'show_in_rest' => true,
+            'auth_callback' => function() {
+                return current_user_can('edit_posts');
+            }
+        ]);
+    }
+});
+
+
