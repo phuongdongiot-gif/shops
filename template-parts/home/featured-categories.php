@@ -97,7 +97,7 @@
                             style="grid-template-rows: 1fr;">
                             <div
                                 class="overflow-hidden grid-inner-wrapper transition-opacity duration-300 ease-out">
-                                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 py-8">
+                                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 py-6 sm:py-8">
                                     <?php
                                     while ($tab_query->have_posts()):
                                         $tab_query->the_post();
@@ -109,9 +109,9 @@
                                                 <a href="<?php the_permalink(); ?>" class="block">
                                                     <?php
                                                     if (has_post_thumbnail()) {
-                                                        the_post_thumbnail('woocommerce_thumbnail', array('class' => 'w-full h-[200px] object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out'));
+                                                        the_post_thumbnail('woocommerce_thumbnail', array('class' => 'w-full h-[140px] sm:h-[200px] object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out'));
                                                     } else {
-                                                        echo '<div class="w-full h-[200px] bg-gray-50 flex items-center justify-center text-gray-400 text-xs">Không có ảnh</div>';
+                                                        echo '<div class="w-full h-[140px] sm:h-[200px] bg-gray-50 flex items-center justify-center text-gray-400 text-xs">Không có ảnh</div>';
                                                     }
                                                     ?>
                                                 </a>
@@ -124,7 +124,7 @@
                                             </div>
 
                                             <div
-                                                class="p-4 flex flex-col flex-1 bg-white relative z-10 border-t border-gray-50">
+                                                class="p-2.5 sm:p-4 flex flex-col flex-1 bg-white relative z-10 border-t border-gray-50">
                                                 <?php
                                                 $terms = get_the_terms($product->get_id(), 'product_cat');
                                                 if ($terms && !is_wp_error($terms)) {
@@ -133,7 +133,7 @@
                                                 }
                                                 ?>
                                                 <h3
-                                                    class="text-[13px] font-heading font-bold text-dark mb-1.5 leading-tight uppercase">
+                                                    class="text-[11px] sm:text-[13px] font-heading font-bold text-dark mb-1 sm:mb-1.5 leading-tight uppercase">
                                                     <a href="<?php the_permalink(); ?>"
                                                         class="hover:text-primary transition-colors line-clamp-2">
                                                         <?php the_title(); ?>
@@ -145,16 +145,16 @@
                                                 if (!empty($short_desc)):
                                                     ?>
                                                     <div
-                                                        class="text-[12px] text-gray-500 mb-2 line-clamp-2 leading-relaxed">
+                                                        class="hidden sm:block text-[12px] text-gray-500 mb-2 line-clamp-2 leading-relaxed">
                                                         <?php echo $short_desc; ?>
                                                     </div>
                                                 <?php endif; ?>
 
                                                 <!-- Add slightly styled price html & Add to list icon -->
                                                 <div
-                                                    class="mt-auto pt-3 flex flex-wrap md:flex-nowrap items-center justify-between border-t border-gray-50/80">
+                                                    class="mt-auto pt-2 sm:pt-3 flex flex-wrap md:flex-nowrap items-center justify-between border-t border-gray-50/80">
                                                     <div
-                                                        class="text-primary font-bold text-[15px] flex items-center gap-1.5 [&>del]:text-[11px] [&>del]:text-gray-400 [&>del]:font-normal [&>ins]:no-underline [&>ins]:text-primary">
+                                                        class="text-primary font-bold text-[12px] sm:text-[15px] flex items-center gap-1 sm:gap-1.5 [&>del]:text-[10px] [&>del]:text-gray-400 [&>del]:font-normal [&>ins]:no-underline [&>ins]:text-primary">
                                                         <?php
                                                         $price = $product->get_price();
                                                         if (empty($price) || $price == 0) {

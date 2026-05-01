@@ -510,9 +510,16 @@ function shopping_dynamic_course_layout()
             /* Ép buộc tất cả ul dù có class lp-list-view hay không đều thành Grid */
             ul.learn-press-courses {
                 display: grid !important;
-                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
-                gap: 2rem !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 1rem !important;
                 width: 100% !important;
+            }
+
+            @media (min-width: 640px) {
+                ul.learn-press-courses {
+                    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+                    gap: 2rem !important;
+                }
             }
 
             ul.learn-press-courses li.course {
