@@ -2,7 +2,7 @@
 // Template Part: Left Sidebar (Trang chủ)
 ?>
 <!-- Left Sidebar -->
-<aside class="w-full lg:w-1/4 space-y-8 shrink-0 relative">
+<aside class="hidden md:block w-full lg:w-1/4 space-y-8 shrink-0 relative">
 
     <!-- Product Categories Widget -->
     <div class="bg-white border-t border-x border-gray-200 shadow-sm">
@@ -77,8 +77,7 @@
                             <div class="flex-1 flex flex-col justify-center">
                                 <h4
                                     class="text-[13px] font-bold text-dark leading-snug mb-1.5 hover:text-primary transition-colors">
-                                    <a
-                                        href="<?php the_permalink(); ?>"><?php echo wp_trim_words(get_the_title(), 10, '...'); ?></a>
+                                    <a href="<?php the_permalink(); ?>"><?php echo wp_trim_words(get_the_title(), 10, '...'); ?></a>
                                 </h4>
                                 <?php
                                 global $product;
@@ -134,8 +133,7 @@
                         <div>
                             <h4
                                 class="text-[13px] font-bold uppercase text-dark leading-tight hover:text-primary transition-colors">
-                                <a
-                                    href="<?php the_permalink(); ?>"><?php echo wp_trim_words(get_the_title(), 12, '...'); ?></a>
+                                <a href="<?php the_permalink(); ?>"><?php echo wp_trim_words(get_the_title(), 12, '...'); ?></a>
                             </h4>
                         </div>
                     </div>

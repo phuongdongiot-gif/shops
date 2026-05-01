@@ -15,6 +15,9 @@ get_header();
 	<!-- Product Categories Carousel -->
 	<?php get_template_part('template-parts/home/category-carousel'); ?>
 
+	<!-- Brand Products Carousel (2 hàng) -->
+	<?php get_template_part('template-parts/home/brand-products-carousel'); ?>
+
 	<!-- Content Wrapper with Sidebar -->
 	<div class="container mx-auto px-6 py-12 lg:py-16 flex flex-col lg:flex-row gap-10 items-start">
 
