@@ -40,7 +40,7 @@
 				}
 			</style>
 			<section class="category-carousel-section mt-10 md:mt-16 bg-white overflow-hidden">
-				<div class="container mx-auto px-6">
+				<div class="container mx-auto px-6 relative">
 					<div class="swiper categorySwiper pb-12">
 						<div class="swiper-wrapper">
 							<?php foreach ($valid_categories as $category): ?>
@@ -59,6 +59,7 @@
 											class="w-full aspect-square rounded-2xl overflow-hidden mb-5 shadow-[0_4px_20px_rgb(0,0,0,0.06)] border border-gray-100/50 flex items-center justify-center bg-gray-50 relative">
 											<img src="<?php echo esc_url($image_url); ?>"
 												alt="<?php echo esc_attr($category->name); ?>"
+												loading="lazy"
 												class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
 											<div
 												class="absolute inset-0 bg-gradient-to-t from-black/40 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -76,6 +77,9 @@
 						</div>
 						<!-- Pagination -->
 						<div class="category-swiper-pagination w-full mt-6 flex justify-center !static"></div>
+						<!-- Navigation Arrows -->
+						<div class="swiper-button-next category-next text-primary !w-10 !h-10 bg-white rounded-full shadow-md border border-gray-100 after:!text-[18px] !right-0 md:!-right-4"></div>
+						<div class="swiper-button-prev category-prev text-primary !w-10 !h-10 bg-white rounded-full shadow-md border border-gray-100 after:!text-[18px] !left-0 md:!-left-4"></div>
 					</div>
 				</div>
 			</section>

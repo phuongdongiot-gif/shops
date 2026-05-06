@@ -18,6 +18,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 el: '.category-swiper-pagination',
                 clickable: true,
             },
+            navigation: {
+                nextEl: '.category-next',
+                prevEl: '.category-prev',
+            },
             breakpoints: {
                 480: { slidesPerView: 3, spaceBetween: 16 },
                 768: { slidesPerView: 4, spaceBetween: 24 },
@@ -40,6 +44,10 @@ document.addEventListener('DOMContentLoaded', function () {
             pagination: {
                 el: '.brand-swiper-pagination',
                 clickable: true,
+            },
+            navigation: {
+                nextEl: '.brand-next',
+                prevEl: '.brand-prev',
             },
             breakpoints: {
                 480: { slidesPerView: 2, spaceBetween: 16 },

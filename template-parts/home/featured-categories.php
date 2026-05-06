@@ -1,7 +1,7 @@
 <?php
 // Template Part: Featured Categories (Trang chủ)
 ?>
-<section class="featured-products hidden lg:block">
+<section class="featured-products">
     <div class="mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-5 border-b-2 border-primary pb-3">
 
         <?php

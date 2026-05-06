@@ -17,10 +17,10 @@
                 <!-- Content positioned at bottom center -->
                 <div class="absolute inset-0 flex flex-col justify-end items-center pb-20 z-10 w-full">
                     <div class="container mx-auto px-6 text-center text-white">
-                        <h1
+                        <h2
                             class="text-3xl md:text-4xl lg:text-5xl font-heading font-extrabold text-white leading-tight mb-4 tracking-tight drop-shadow-lg">
                             <?php echo esc_html(get_theme_mod('hero_title_1', 'Trải Nghiệm Dịch Vụ Hoàn Hảo')); ?>
-                        </h1>
+                        </h2>
                         <p class="text-base text-gray-100 mb-8 max-w-2xl mx-auto drop-shadow-md">
                             <?php echo esc_html(get_theme_mod('hero_desc_1', 'Khám phá bộ sưu tập cao cấp với chất lượng tuyệt hảo, mang đến giá trị đích thực cho cuộc sống.')); ?>
                         </p>
@@ -43,7 +43,7 @@
                 <!-- Full Width Background Image -->
                 <?php $hero_img_2 = get_theme_mod('hero_img_2', 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=1920&q=80'); ?>
                 <img src="<?php echo esc_url($hero_img_2); ?>"
-                    alt="Slide 2" class="absolute inset-0 w-full h-full object-cover">
+                    alt="Slide 2" loading="lazy" class="absolute inset-0 w-full h-full object-cover">
                 <!-- Overlay for text readability -->
                 <div class="absolute inset-0 bg-black/50"></div>
                 <!-- Content positioned at bottom center -->
