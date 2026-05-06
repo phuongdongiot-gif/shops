@@ -104,32 +104,62 @@
 	</div>
 
 	<!-- 3. BOTTOMBAR NAV -->
-	<header id="masthead" class="site-header static lg:sticky top-0 z-50 bg-white/95 backdrop-blur shadow-sm transition-all duration-300">
-		<div class="container mx-auto px-6 min-h-[56px] flex flex-col lg:flex-row items-center justify-between gap-4 py-2 lg:py-0">
-			<div class="main-navigation-wrapper w-full lg:w-auto h-full flex items-center">
+	<header id="masthead" class="site-header relative lg:sticky top-0 z-50 bg-white/95 backdrop-blur shadow-sm transition-all duration-300">
+		<div class="container mx-auto px-4 md:px-6 min-h-[56px] flex flex-wrap items-center justify-between gap-y-3 py-3 lg:py-0">
+			
+            <!-- [1] MENU WRAPPER -->
+            <div class="main-navigation-wrapper w-auto h-full flex items-center order-1">
 				<?php get_template_part( 'template-parts/header-nav' ); ?>
-			</div><!-- .main-navigation-wrapper -->
+			</div>
 
-			<div class="header-actions flex flex-wrap justify-center items-center gap-6 mt-2 lg:mt-0">
-				<?php if ( function_exists( 'pll_the_languages' ) ) : ?>
-					<ul class="polylang-switcher flex items-center gap-3 list-none m-0 p-0 pr-6 border-r border-gray-200">
-						<?php pll_the_languages( array( 'dropdown' => 0, 'show_flags' => 1, 'show_names' => 0 ) ); ?>
-					</ul>
-				<?php endif; ?>
+            <!-- [2] SEARCH BAR -->
+            <!-- Mobile: Tụt xuống hàng 2 (order-3), w-full -->
+            <!-- Desktop: Đứng giữa (order-2), canh lề phải tự động (ml-auto) -->
+            <div class="live-search-container relative w-full lg:w-64 xl:w-80 order-3 lg:order-2 lg:ml-auto mt-1 lg:mt-0">
+                <form role="search" method="get" class="search-form relative z-10 block" action="<?php echo esc_url( home_url( '/' ) ); ?>">
+                    <?php if ( class_exists('WooCommerce') ) : ?>
+                        <input type="hidden" name="post_type" value="product" />
+                    <?php endif; ?>
+                    <input type="search" id="live-search-input" class="search-field w-full pl-4 pr-10 py-2.5 text-[13px] text-gray-800 bg-[#f3f4f6] border border-transparent rounded-full focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all shadow-inner" placeholder="<?php echo esc_attr__( 'Tìm kiếm sản phẩm...', 'shopping' ); ?>" value="<?php echo get_search_query(); ?>" name="s" autocomplete="off" />
+                    <button type="submit" class="search-submit absolute right-0 top-0 h-full px-4 text-gray-500 hover:text-primary transition-colors flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </button>
+                </form>
+                
+                <div id="live-search-results" class="absolute top-full left-0 right-0 lg:right-0 lg:left-auto mt-2 bg-white rounded-xl shadow-[0_10px_40px_rgb(0,0,0,0.12)] border border-gray-100 overflow-hidden z-[100] hidden flex-col w-full lg:min-w-[300px] max-h-[70vh] overflow-y-auto transform origin-top transition-all scale-y-95 opacity-0">
+                    <div class="p-4 text-center text-sm text-gray-500 loading-indicator hidden">
+                        <svg class="animate-spin h-5 w-5 mx-auto text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span class="block mt-2 font-semibold">Đang tìm kiếm...</span>
+                    </div>
+                    <ul class="results-list list-none m-0 p-0 text-left"></ul>
+                    <a href="#" id="view-all-results" class="hidden block w-full text-center py-3 bg-gray-50 text-[13px] font-bold text-primary hover:bg-orange-50 transition-colors border-t border-gray-100 uppercase tracking-widest">
+                        Xem tất cả kết quả &rarr;
+                    </a>
+                </div>
+            </div>
 
-				<?php /* TẠM THỜI BỎ GIỎ HÀNG
-                if ( class_exists( 'WooCommerce' ) ) : ?>
-					<a class="header-cart relative flex items-center text-dark font-medium group" href="<?php echo esc_url( wc_get_cart_url() ); ?>" title="<?php esc_attr_e( 'View your shopping cart', 'shopping' ); ?>">
-						<svg class="header-cart-icon w-6 h-6 mr-2 text-gray-700 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-							<circle cx="9" cy="21" r="1"></circle>
-							<circle cx="20" cy="21" r="1"></circle>
-							<path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-						</svg>
-						<span class="header-cart-text hidden"><?php echo wp_kses_data( WC()->cart->get_cart_subtotal() ); ?></span>
-						<div class="header-cart-count absolute -top-2 -right-2 bg-primary text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-sm"><?php echo WC()->cart->get_cart_contents_count(); ?></div>
-					</a>
-				<?php endif; 
-                */ ?>
-			</div><!-- .header-actions -->
+            <!-- [3] RIGHT ACTIONS (Ngôn ngữ + Giỏ hàng) -->
+            <!-- Mobile: Nằm cùng dòng bên phải Menu (order-2) -->
+            <!-- Desktop: Nằm sát biên phải, bên cạnh Search (order-3) -->
+            <div class="header-actions-right w-auto flex items-center justify-end gap-4 lg:gap-6 order-2 lg:order-3 lg:ml-6">
+                <!-- Polylang Switcher -->
+                <?php if ( function_exists( 'pll_the_languages' ) ) : ?>
+                    <ul class="polylang-switcher flex items-center gap-3 list-none m-0 p-0 lg:pr-6 lg:border-r border-gray-200">
+                        <?php pll_the_languages( array( 'dropdown' => 0, 'show_flags' => 1, 'show_names' => 0 ) ); ?>
+                    </ul>
+                <?php endif; ?>
+
+                <!-- Cart / Tư vấn -->
+                <?php if ( class_exists( 'WooCommerce' ) ) : ?>
+                    <a id="shopping-cart-trigger" class="header-cart relative flex items-center text-dark font-medium group" href="<?php echo esc_url( wc_get_cart_url() ); ?>" title="Xem danh sách cần tư vấn">
+                        <svg class="header-cart-icon w-6 h-6 text-gray-700 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                        </svg>
+                        <span class="ml-2 text-[14px] hidden lg:block group-hover:text-primary transition-colors">Danh sách</span>
+                        <div class="header-cart-count absolute -top-2 lg:-right-2 -right-2 bg-primary text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-sm"><?php echo WC()->cart->get_cart_contents_count(); ?></div>
+                    </a>
+                <?php endif; ?>
+            </div>
+
 		</div><!-- .container -->
 	</header><!-- #masthead -->

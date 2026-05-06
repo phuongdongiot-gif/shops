@@ -102,7 +102,7 @@ p { line-height: 1.6; }
 }
 
 .woocommerce ul.products li.product .woocommerce-loop-product__title {
-  font-family: 'Outfit', sans-serif;
+  font-family: serif !important;
   font-size: 1.125rem;
   color: #111827;
   margin-top: 0.5rem;
@@ -135,7 +135,7 @@ p { line-height: 1.6; }
 }
 
 .woocommerce div.product .product_title {
-  font-family: 'Outfit', sans-serif;
+  font-family: serif !important;
   font-size: 2.5rem;
   margin-bottom: 1rem;
 }
@@ -225,4 +225,9 @@ p { line-height: 1.6; }
 .woocommerce .woocommerce-before-shop-loop .woocommerce-ordering select:focus {
   border-color: #ea580c;
   box-shadow: 0 0 0 1px #ea580c;
+}
+
+/* Override toàn bộ font trong theme thành serif */
+body, h1, h2, h3, h4, h5, h6, p, a, span, div, input, button, select, textarea, .font-heading, .font-sans, .font-base, .font-body {
+  font-family: serif !important;
 }
