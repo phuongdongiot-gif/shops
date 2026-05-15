@@ -46,11 +46,11 @@ get_header();
 				<!-- Categories / Benefits Section -->
 				<?php get_template_part('template-parts/home/benefits'); ?>
 
-				<!-- Latest News Section -->
-				<?php get_template_part('template-parts/home/latest-news'); ?>
-
 		</div><!-- End Main Content -->
 	</div><!-- End Content Wrapper -->
+
+	<!-- Latest News Section -->
+	<?php get_template_part('template-parts/home/latest-news'); ?>
 
 </main><!-- #primary -->
 

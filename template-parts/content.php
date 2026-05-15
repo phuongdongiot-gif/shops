@@ -15,11 +15,24 @@ if ( is_singular() ) :
 		<?php the_title( '<h1 class="entry-title text-3xl md:text-4xl font-heading font-extrabold mb-3 text-dark leading-tight">', '</h1>' ); ?>
 		
 		<?php if ( 'post' === get_post_type() ) : ?>
-			<div class="entry-meta flex items-center gap-4 text-[13px] text-gray-500 font-medium mb-6 pb-6 border-b border-gray-100">
+			<div class="entry-meta flex flex-wrap items-center gap-4 text-[13px] text-gray-500 font-medium mb-6 pb-6 border-b border-gray-100">
+				<!-- Author -->
+				<span class="flex items-center gap-1.5">
+					<svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+					<?php the_author(); ?>
+				</span>
+				
+				<!-- Date -->
 				<?php
 				$time_string = '<time class="entry-date published updated flex items-center gap-1.5" datetime="%1$s"><svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>%2$s</time>';
 				printf( $time_string, esc_attr( get_the_date( DATE_W3C ) ), esc_html( get_the_date() ) );
 				?>
+				
+				<!-- Categories -->
+				<span class="flex items-center gap-1.5">
+					<svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+					<?php the_category( ', ' ); ?>
+				</span>
 			</div>
 		<?php endif; ?>
 	</header>
@@ -32,6 +45,25 @@ if ( is_singular() ) :
 		wp_link_pages( array( 'before' => '<div class="page-links mt-6 font-bold">' . esc_html__( 'Pages:', 'shopping' ), 'after'  => '</div>' ) );
 		?>
 	</div>
+
+	<footer class="entry-footer mt-10 pt-6 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+		<div class="post-tags flex items-center gap-2 flex-wrap">
+			<?php if ( has_tag() ) : ?>
+				<span class="text-sm font-bold text-gray-700">Tags:</span>
+				<?php the_tags( '<span class="bg-gray-50 text-gray-600 px-3 py-1 text-[13px] rounded-md border border-gray-100 hover:text-primary transition-colors">', '</span><span class="bg-gray-50 text-gray-600 px-3 py-1 text-[13px] rounded-md border border-gray-100 hover:text-primary transition-colors">', '</span>' ); ?>
+			<?php endif; ?>
+		</div>
+		
+		<div class="social-share flex items-center gap-3">
+			<span class="text-sm font-bold text-gray-700">Chia sẻ:</span>
+			<a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode(get_permalink()); ?>" target="_blank" class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm" title="Chia sẻ Facebook">
+				<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.77,7.46H14.5v-1.9c0-.9.6-1.1,1-1.1h3V.5h-4.33C10.24.5,9.5,3.44,9.5,5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4Z"/></svg>
+			</a>
+			<a href="https://twitter.com/intent/tweet?url=<?php echo urlencode(get_permalink()); ?>&text=<?php echo urlencode(get_the_title()); ?>" target="_blank" class="w-8 h-8 flex items-center justify-center rounded-full bg-sky-500 text-white hover:bg-sky-600 transition-colors shadow-sm" title="Chia sẻ Twitter">
+				<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.954 4.569c-.885.389-1.83.654-2.825.775 1.014-.611 1.794-1.574 2.163-2.723-.951.555-2.005.959-3.127 1.184-.896-.959-2.173-1.559-3.591-1.559-2.717 0-4.92 2.203-4.92 4.917 0 .39.045.765.127 1.124C7.691 8.094 4.066 6.13 1.64 3.161c-.427.722-.666 1.561-.666 2.475 0 1.71.87 3.213 2.188 4.096-.807-.026-1.566-.248-2.228-.616v.061c0 2.385 1.693 4.374 3.946 4.827-.413.111-.849.171-1.296.171-.314 0-.615-.03-.916-.086.631 1.953 2.445 3.377 4.604 3.417-1.68 1.319-3.809 2.105-6.102 2.105-.39 0-.779-.023-1.17-.067 2.189 1.394 4.768 2.209 7.557 2.209 9.054 0 13.999-7.496 13.999-13.986 0-.209 0-.42-.015-.63.961-.689 1.8-1.56 2.46-2.548l-.047-.02z"/></svg>
+			</a>
+		</div>
+	</footer>
 </article>
 
 <?php else : // NẾU LÀ TRANG ARCHIVE / DANH SÁCH ?>

@@ -8,11 +8,11 @@
 get_header();
 ?>
 
-<main id="primary" class="site-main container mx-auto px-4 py-8 lg:py-12">
-	<div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+<main id="primary" class="site-main container mx-auto px-4 py-6 lg:py-10">
+	<div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
 		
 		<!-- Cột Nội dung chính -->
-		<div class="lg:w-2/3 xl:w-[70%]">
+		<div class="lg:w-2/3 xl:w-[72%]">
 			<?php
 			while ( have_posts() ) :
 				the_post();
@@ -36,11 +36,11 @@ get_header();
 		</div>
 
 		<!-- Cột Tin Tức Liên Quan (Sidebar) -->
-		<aside class="lg:w-1/3 xl:w-[30%]">
+		<aside class="lg:w-1/3 xl:w-[28%]">
 			<div class="sticky top-28">
-				<div class="bg-gray-50/50 rounded-2xl p-6 border border-gray-100 shadow-sm">
-					<h3 class="text-xl font-heading font-extrabold text-dark mb-6 flex items-center gap-2 uppercase tracking-wide border-b border-gray-200 pb-4">
-						<svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+				<div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+					<h3 class="text-lg font-heading font-bold text-dark mb-5 flex items-center gap-2 uppercase tracking-wide border-b border-gray-100 pb-3">
+						<svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
 						Tin tức liên quan
 					</h3>
 					
@@ -66,8 +66,8 @@ get_header();
 								while( $related_query->have_posts() ) {
 									$related_query->the_post();
 									?>
-									<article class="group flex gap-4 items-start">
-										<a href="<?php the_permalink(); ?>" class="shrink-0 w-24 h-24 rounded-xl overflow-hidden shadow-sm relative">
+									<article class="group flex gap-3 items-start">
+										<a href="<?php the_permalink(); ?>" class="shrink-0 w-20 h-20 rounded-lg overflow-hidden shadow-sm relative">
 											<?php if ( has_post_thumbnail() ) : ?>
 												<?php the_post_thumbnail( 'thumbnail', array( 'class' => 'w-full h-full object-cover group-hover:scale-110 transition-transform duration-500' ) ); ?>
 											<?php else: ?>
@@ -78,7 +78,7 @@ get_header();
 											<div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors"></div>
 										</a>
 										<div class="flex-1 min-w-0">
-											<h4 class="font-bold text-[15px] leading-snug mb-1.5">
+											<h4 class="font-semibold text-sm leading-snug mb-1.5">
 												<a href="<?php the_permalink(); ?>" class="text-gray-800 hover:text-primary transition-colors line-clamp-2">
 													<?php the_title(); ?>
 												</a>
