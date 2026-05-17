@@ -57,24 +57,14 @@
 			<div class="flex justify-center my-6">
 				<?php
 				if (has_custom_logo()) {
-					echo '<div class="brightness-0 invert">';
+					echo '<div class="w-40 md:w-56 max-w-full bg-white/10 rounded-lg p-2 md:p-3 inline-block">';
 					the_custom_logo();
 					echo '</div>';
 				}
 				?>
 			</div>
 
-			<!-- Bộ Công Thương Badge (Dùng CSS tạo mô phỏng) -->
-			<div class="flex justify-center mt-2">
-				<div
-					class="px-3 py-1 bg-red-600 rounded-lg border border-white text-white text-xs font-bold flex items-center gap-1.5 shadow-sm opacity-90 hover:opacity-100 transition whitespace-nowrap">
-					<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-						<path
-							d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-1.5H9c-.55 0-1-.45-1-1s.45-1 1-1h3c1.1 0 2-.9 2-2s-.9-2-2-2h-1v-1.5h-2v1.5H7v2h3v1H9c-1.1 0-2 .9-2 2s.9 2 2 2h3v1.5h2v-1.5h1.5v-2H11z" />
-					</svg>
-					ĐÃ ĐĂNG KÝ BỘ CÔNG THƯƠNG
-				</div>
-			</div>
+
 		</div>
 
 	</div><!-- .container -->

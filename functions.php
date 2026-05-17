@@ -298,7 +298,7 @@ function shopping_add_tailwind_cdn()
                     },
                     fontFamily: {
                         base: ['Inter', 'sans-serif'],
-                        heading: ['Outfit', 'sans-serif'],
+                        heading: ['Inter', 'sans-serif'],
                     }
                 }
             }
@@ -500,47 +500,255 @@ function shopping_translate_learnpress($translated_text, $text, $domain)
     return $translated_text;
 }
 
-// --------- ĐÈ BẸP CSS LIST VIEW CỦA LEARNPRESS ĐỂ LUÔN ĐẸP VÀ RỘNG ---------
+// --------- ĐÈ BẸP CSS LIST VIEW CỦA LEARNPRESS - CỐ ĐỊNH GRID 3 CỘT DESKTOP ---------
 add_action('wp_head', 'shopping_dynamic_course_layout');
 function shopping_dynamic_course_layout()
 {
     if (is_post_type_archive('lp_course') || is_tax('course_category') || is_tax('course_tag')) {
         ?>
         <style>
-            /* Ép buộc tất cả ul dù có class lp-list-view hay không đều thành Grid */
-            ul.learn-press-courses {
+            /* === Force Grid Layout: Luôn dùng grid, không phụ thuộc vào trạng thái list/grid của LP === */
+            ul.learn-press-courses,
+            ul.learn-press-courses.lp-list-view,
+            ul.learn-press-courses.lp-grid-view {
                 display: grid !important;
-                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
-                gap: 2rem !important;
+                grid-template-columns: 1fr !important;  /* Mobile: 1 cột */
+                gap: 1.25rem !important;
                 width: 100% !important;
+                list-style: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            @media (min-width: 640px) {
+                ul.learn-press-courses,
+                ul.learn-press-courses.lp-list-view,
+                ul.learn-press-courses.lp-grid-view {
+                    grid-template-columns: repeat(2, 1fr) !important;  /* Tablet: 2 cột */
+                    gap: 1.5rem !important;
+                }
+            }
+
+            @media (min-width: 1024px) {
+                ul.learn-press-courses,
+                ul.learn-press-courses.lp-list-view,
+                ul.learn-press-courses.lp-grid-view {
+                    grid-template-columns: repeat(3, 1fr) !important;  /* Desktop: 3 cột cố định */
+                    gap: 1.75rem !important;
+                }
             }
 
             ul.learn-press-courses li.course {
                 width: 100% !important;
                 display: flex !important;
                 flex-direction: column !important;
-                margin-bottom: 0 !important;
+                margin: 0 !important;
+                float: none !important;
             }
 
-            /* Ẩn nút chuyển đổi Grid/List vì Grid đã hoàn hảo */
-            .lp-courses-bar .courses-switch-view {
+            /* Ẩn nút chuyển đổi Grid/List */
+            .lp-courses-bar .courses-switch-view,
+            .lp-courses-bar .courses-switch-layout {
                 display: none !important;
             }
 
-            /* Mở rộng toàn bộ trang Courses cho rộng rãi */
+            /* Toàn bộ vùng archive Courses full width */
             .lp-archive-courses {
                 width: 100% !important;
-                max-width: 1200px !important;
+                max-width: 100% !important;
                 margin: 0 auto !important;
             }
 
-            #lp-archive-courses {
+            .lp-content-area,
+            .lp-main-content {
+                width: 100% !important;
                 max-width: 100% !important;
             }
         </style>
         <?php
     }
 }
+
+// Force default layout = grid (bỏ qua cookie/localStorage của LearnPress)
+add_filter('learn_press_course_loop_begin', 'shopping_force_grid_ul', 10);
+function shopping_force_grid_ul($html) {
+    // Đảm bảo class không phải lp-list-view
+    $html = str_replace('lp-list-view', 'lp-grid-view', $html);
+    return $html;
+}
+
+// =========================================================
+// CAROUSEL TIN TỨC MỚI NHẤT — Hiển thị dưới trang /courses
+// =========================================================
+add_action('learn-press/after-main-content', 'shopping_lp_archive_news_carousel', 20);
+function shopping_lp_archive_news_carousel() {
+    // Chỉ hiển thị trên trang archive khóa học, KHÔNG hiển thị trên single course
+    if (is_post_type_archive('lp_course') || is_tax('course_category') || is_tax('course_tag')) {
+        get_template_part('template-parts/learnpress/courses-news-carousel');
+    }
+}
+
+// =========================================================
+// KHÓA HỌC LIÊN QUAN — Sidebar trang /courses/slug
+// =========================================================
+add_action('learn-press/after-course-summary-sidebar', 'shopping_lp_related_courses_sidebar', 30);
+function shopping_lp_related_courses_sidebar() {
+    if (is_singular('lp_course')) {
+        get_template_part('template-parts/learnpress/related-courses');
+    }
+}
+
+// =========================================================
+// ẨN SIDEBAR WIDGET MẶC ĐỊNH CỦA LEARNPRESS
+// (.lp-archive-courses-sidebar và .course-sidebar-secondary)
+// Trên cả /courses và /courses/slug
+// =========================================================
+add_filter('is_active_sidebar', 'shopping_suppress_lp_widget_sidebars', 20, 2);
+function shopping_suppress_lp_widget_sidebars($is_active, $sidebar_id) {
+    // Chỉ can thiệp trên trang LearnPress
+    if (!is_post_type_archive('lp_course')
+        && !is_tax('course_category')
+        && !is_tax('course_tag')
+        && !is_singular('lp_course')
+    ) {
+        return $is_active;
+    }
+
+    // Ẩn 2 sidebar widget area mặc định của LP
+    $lp_sidebars = ['archive-courses-sidebar', 'course-sidebar'];
+    if (in_array($sidebar_id, $lp_sidebars, true)) {
+        return false;
+    }
+
+    return $is_active;
+}
+
+// =========================================================
+// DANH MỤC KHÓA HỌC — Sidebar trang /courses (archive)
+// =========================================================
+add_action('learn-press/archive-course/sidebar', 'shopping_lp_archive_category_sidebar', 10);
+function shopping_lp_archive_category_sidebar() {
+    if (is_post_type_archive('lp_course') || is_tax('course_category') || is_tax('course_tag')) {
+        get_template_part('template-parts/learnpress/archive-category-sidebar');
+    }
+}
+
+// Thêm class has-sidebar vào lp-content-area kể cả khi widget area rỗng
+add_filter('learn_press_archive_course_content_class', 'shopping_lp_force_sidebar_class');
+function shopping_lp_force_sidebar_class($classes) {
+    if (is_post_type_archive('lp_course') || is_tax('course_category') || is_tax('course_tag')) {
+        if (!in_array('has-sidebar', $classes)) {
+            $classes[] = 'has-sidebar';
+        }
+    }
+    return $classes;
+}
+
+// CSS bổ sung: đảm bảo .lp-content-area luôn có layout 2 cột trên /courses
+add_action('wp_head', 'shopping_lp_archive_layout_css');
+function shopping_lp_archive_layout_css() {
+    if (is_post_type_archive('lp_course') || is_tax('course_category') || is_tax('course_tag')) {
+        ?>
+        <style>
+            /* Force layout 2 cột (content + sidebar) cho trang /courses */
+            .lp-content-area {
+                display: flex !important;
+                gap: 2rem !important;
+                align-items: flex-start !important;
+                max-width: 1280px !important;
+                margin: 0 auto !important;
+                padding: 1.5rem 1.25rem !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .lp-main-content {
+                flex: 1 1 0% !important;
+                min-width: 0 !important;
+            }
+
+            .lp-archive-category-sidebar {
+                width: 280px !important;
+                flex-shrink: 0 !important;
+                position: sticky !important;
+                top: 90px !important;
+            }
+
+            /* Mobile: sidebar ẩn, full width */
+            @media (max-width: 1023px) {
+                .lp-content-area {
+                    flex-direction: column !important;
+                }
+
+                .lp-archive-category-sidebar {
+                    width: 100% !important;
+                    position: static !important;
+                }
+            }
+        </style>
+        <?php
+    }
+}
+
+
+
+
+// =========================================================
+// TẮT BÌNH LUẬN TRÊN TẤT CẢ TRANG LEARNPRESS (/courses & /courses/slug)
+// =========================================================
+
+
+/**
+ * 1. Đóng comments cho post type lp_course ở cấp độ WordPress core
+ *    → comments_open() sẽ trả về false, LearnPress sẽ không render form
+ */
+add_filter('comments_open', 'shopping_disable_lp_course_comments', 20, 2);
+function shopping_disable_lp_course_comments($open, $post_id) {
+    if (get_post_type($post_id) === 'lp_course') {
+        return false;
+    }
+    return $open;
+}
+
+/**
+ * 2. Số comments luôn = 0 với lp_course
+ *    → Loại bỏ tab bình luận nếu LearnPress check comments_number()
+ */
+add_filter('get_comments_number', 'shopping_zero_lp_course_comments', 20, 2);
+function shopping_zero_lp_course_comments($count, $post_id) {
+    if (get_post_type($post_id) === 'lp_course') {
+        return 0;
+    }
+    return $count;
+}
+
+/**
+ * 3. Xóa action comments_template của LearnPress khỏi single course
+ *    → Ngăn LP render khu vực #comments hoàn toàn
+ */
+add_action('wp', 'shopping_remove_lp_comments_template');
+function shopping_remove_lp_comments_template() {
+    if (is_singular('lp_course')) {
+        // Xóa comments_template được gọi bởi LP hoặc theme
+        remove_action('learn-press/after-single-course',   'comments_template');
+        remove_action('learn-press/single-course-summary', 'comments_template');
+        // Ngăn WordPress tự gọi comments_template trong the_content
+        add_filter('comments_template', 'shopping_lp_empty_comments_template');
+    }
+}
+
+/**
+ * 4. Trả về file trống thay cho comments.php khi ở trang khóa học
+ */
+function shopping_lp_empty_comments_template($template) {
+    if (is_singular('lp_course')) {
+        // Trả về một file PHP trắng tạm thời qua ob
+        add_filter('the_content', function($content) { return $content; });
+        return get_stylesheet_directory() . '/learnpress/empty-comments.php';
+    }
+    return $template;
+}
+
 
 // Dịch Thuật Tab Đánh Giá (Reviews) sang Tiếng Việt bằng Hook gettext
 add_filter('gettext', 'shopping_translate_reviews', 20, 3);
@@ -953,7 +1161,7 @@ function shopping_floating_action_buttons()
     }
     $tel = str_replace(array(' ', '.', '-'), '', $phone);
     $zalo = get_theme_mod('contact_zalo', 'https://zalo.me/0799036842');
-    $messenger = get_theme_mod('contact_messenger', 'https://m.me/yourfanpage');
+    $messenger = 'https://www.facebook.com/profile.php?id=61556342532989&locale=vi_VN';
 
     ?>
     <style>
@@ -1005,11 +1213,11 @@ function shopping_floating_action_buttons()
             height: 22px;
             object-fit: contain;
         }
-        
+
         .fab-mess svg {
             fill: white;
         }
-        
+
         .fab-phone svg {
             fill: none !important;
             stroke: white;
@@ -1079,11 +1287,13 @@ function shopping_floating_action_buttons()
             </a>
         <?php endif; ?>
 
-        <a href="tel:<?php echo esc_attr($tel); ?>" class="fab-btn fab-phone" title="Gọi Ngay" style="color: white;">
-            <svg viewBox="0 0 24 24">
-                <path
-                    d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56M16.48 14.82c-.38-.13-.81-.05-1.07.2l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1.03M7.22 8.52C6.86 7.41 6.66 6.22 6.66 4.99M6.66 4.99h-3.4M20.01 15.38v3.4"
-                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        <a href="tel:<?php echo esc_attr($tel); ?>" class="fab-btn fab-phone" title="Gọi Ngay"
+            style="color: white; display: flex; align-items: center; justify-content: center;">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
+                </path>
             </svg>
         </a>
     </div>
@@ -1399,3 +1609,162 @@ function shopping_hero_customize_register($wp_customize)
     ));
 }
 add_action('customize_register', 'shopping_hero_customize_register');
+
+// Bỏ bình luận (Reviews) trong chi tiết sản phẩm WooCommerce
+add_filter('woocommerce_product_tabs', 'shopping_remove_product_reviews_tab', 98);
+function shopping_remove_product_reviews_tab($tabs)
+{
+    unset($tabs['reviews']);
+    return $tabs;
+}
+
+// Thêm Carousel tin tức mới nhất dưới phần chi tiết sản phẩm
+add_action('woocommerce_after_single_product_summary', 'shopping_latest_news_carousel_product', 30);
+function shopping_latest_news_carousel_product()
+{
+    ?>
+    <div class="product-latest-news-carousel mt-12 mb-8 clear-both w-full">
+        <h3
+            class="text-xl md:text-2xl font-heading font-bold text-dark mb-6 flex items-center gap-2 uppercase tracking-wide border-b border-gray-100 pb-3">
+            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z">
+                </path>
+            </svg>
+            <?php esc_html_e('Tin tức mới nhất', 'shopping'); ?>
+        </h3>
+
+        <div
+            class="flex overflow-x-auto snap-x snap-mandatory gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:pb-0 scrollbar-hide">
+            <?php
+            $latest_args = array(
+                'post_type' => 'post',
+                'posts_per_page' => 9,
+                'ignore_sticky_posts' => 1
+            );
+            $latest_query = new WP_Query($latest_args);
+
+            if ($latest_query->have_posts()) {
+                while ($latest_query->have_posts()) {
+                    $latest_query->the_post();
+                    ?>
+                    <article
+                        class="snap-start shrink-0 w-[260px] md:w-auto bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden group">
+                        <a href="<?php the_permalink(); ?>" class="block h-[150px] md:h-[180px] relative overflow-hidden">
+                            <?php if (has_post_thumbnail()): ?>
+                                <?php the_post_thumbnail('medium', array('class' => 'w-full h-full object-cover group-hover:scale-110 transition-transform duration-500')); ?>
+                            <?php else: ?>
+                                <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                                    <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                </div>
+                            <?php endif; ?>
+                            <div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors"></div>
+                        </a>
+                        <div class="p-4">
+                            <h4 class="font-bold text-sm md:text-base leading-snug mb-2">
+                                <a href="<?php the_permalink(); ?>"
+                                    class="text-gray-800 hover:text-primary transition-colors line-clamp-2">
+                                    <?php the_title(); ?>
+                                </a>
+                            </h4>
+                            <div class="text-[12px] text-gray-400 font-medium flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <?php echo get_the_date(); ?>
+                            </div>
+                        </div>
+                    </article>
+                    <?php
+                }
+                wp_reset_postdata();
+            } else {
+                echo '<p class="text-sm text-gray-500 italic">Không có bài viết nào.</p>';
+            }
+            ?>
+        </div>
+    </div>
+    <?php
+}
+
+// Thêm Carousel tin tức mới nhất dưới phần Cửa hàng / Danh mục sản phẩm
+add_action('woocommerce_after_main_content', 'shopping_latest_news_carousel_archive', 20);
+function shopping_latest_news_carousel_archive()
+{
+    // Chỉ hiển thị ở trang Danh mục sản phẩm hoặc trang Cửa hàng chính
+    if (is_product_category() || is_shop()) {
+        ?>
+        <div class="product-latest-news-carousel mt-12 mb-8 clear-both w-full">
+            <h3
+                class="text-xl md:text-2xl font-heading font-bold text-dark mb-6 flex items-center gap-2 uppercase tracking-wide border-b border-gray-100 pb-3">
+                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z">
+                    </path>
+                </svg>
+                <?php esc_html_e('Tin tức mới nhất', 'shopping'); ?>
+            </h3>
+
+            <div
+                class="flex overflow-x-auto snap-x snap-mandatory gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:pb-0 scrollbar-hide">
+                <?php
+                $latest_args = array(
+                    'post_type' => 'post',
+                    'posts_per_page' => 9,
+                    'ignore_sticky_posts' => 1
+                );
+                $latest_query = new WP_Query($latest_args);
+
+                if ($latest_query->have_posts()) {
+                    while ($latest_query->have_posts()) {
+                        $latest_query->the_post();
+                        ?>
+                        <article
+                            class="snap-start shrink-0 w-[260px] md:w-auto bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden group">
+                            <a href="<?php the_permalink(); ?>" class="block h-[150px] md:h-[180px] relative overflow-hidden">
+                                <?php if (has_post_thumbnail()): ?>
+                                    <?php the_post_thumbnail('medium', array('class' => 'w-full h-full object-cover group-hover:scale-110 transition-transform duration-500')); ?>
+                                <?php else: ?>
+                                    <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                                        <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                <?php endif; ?>
+                                <div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors"></div>
+                            </a>
+                            <div class="p-4">
+                                <h4 class="font-bold text-sm md:text-base leading-snug mb-2">
+                                    <a href="<?php the_permalink(); ?>"
+                                        class="text-gray-800 hover:text-primary transition-colors line-clamp-2">
+                                        <?php the_title(); ?>
+                                    </a>
+                                </h4>
+                                <div class="text-[12px] text-gray-400 font-medium flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <?php echo get_the_date(); ?>
+                                </div>
+                            </div>
+                        </article>
+                        <?php
+                    }
+                    wp_reset_postdata();
+                } else {
+                    echo '<p class="text-sm text-gray-500 italic">Không có bài viết nào.</p>';
+                }
+                ?>
+            </div>
+        </div>
+        <?php
+    }
+}

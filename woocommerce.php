@@ -20,6 +20,13 @@ get_header();
 				} else {
 					echo '<p class="text-center text-red-500 font-semibold text-lg">WooCommerce is not installed.</p>';
 				}
+				
+				// Hiển thị Carousel tin tức ở Cửa hàng / Danh mục
+				if ( is_shop() || is_product_category() || is_product_tag() ) {
+					if ( function_exists('shopping_latest_news_carousel_archive') ) {
+						shopping_latest_news_carousel_archive();
+					}
+				}
 				?>
 			</div>
 

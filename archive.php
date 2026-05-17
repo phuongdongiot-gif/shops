@@ -8,13 +8,13 @@
 get_header();
 ?>
 
-<main id="primary" class="site-main container mx-auto px-4 py-6 md:py-12">
+<main id="primary" class="site-main container mx-auto px-4 py-4 md:py-12">
 
 	<?php if ( have_posts() ) : ?>
 
-		<header class="page-header mb-8 md:mb-12 text-center border-b border-gray-100 pb-6 md:pb-8">
+		<header class="page-header mb-6 md:mb-12 text-center border-b border-gray-100 pb-4 md:pb-8">
 			<?php
-			the_archive_title( '<h1 class="page-title text-2xl md:text-4xl font-heading font-extrabold mb-3 md:mb-4 uppercase text-dark tracking-tight">', '</h1>' );
+			the_archive_title( '<h1 class="page-title text-xl md:text-4xl font-heading font-extrabold mb-2 md:mb-4 uppercase text-dark tracking-tight">', '</h1>' );
 			the_archive_description( '<div class="archive-description text-gray-500 max-w-2xl mx-auto text-sm md:text-base">', '</div>' );
 			?>
 		</header>
@@ -50,8 +50,8 @@ get_header();
 		
 		if ( $carousel_query->have_posts() ) :
 		?>
-			<div class="relative w-full mb-12 md:mb-16 overflow-hidden rounded-2xl md:rounded-3xl shadow-lg group bg-gray-900" id="archive-carousel">
-				<div class="flex transition-transform duration-700 ease-out h-[350px] md:h-[500px]" id="archive-carousel-inner">
+			<div class="relative w-full mb-8 md:mb-16 overflow-hidden rounded-2xl md:rounded-3xl shadow-lg group bg-gray-900" id="archive-carousel">
+				<div class="flex transition-transform duration-700 ease-out h-[250px] sm:h-[350px] md:h-[500px]" id="archive-carousel-inner">
 					<?php while ( $carousel_query->have_posts() ) : $carousel_query->the_post(); ?>
 						<div class="w-full shrink-0 relative">
 							<?php if ( has_post_thumbnail() ) : ?>
@@ -67,7 +67,7 @@ get_header();
 								}
 								?>
 								<a href="<?php the_permalink(); ?>" class="block max-w-4xl">
-									<h2 class="text-2xl md:text-5xl font-extrabold text-white mb-3 md:mb-4 hover:text-yellow-400 transition-colors line-clamp-3 md:line-clamp-2 leading-snug md:leading-tight"><?php the_title(); ?></h2>
+									<h2 class="text-xl md:text-5xl font-extrabold text-white mb-2 md:mb-4 hover:text-yellow-400 transition-colors line-clamp-3 md:line-clamp-2 leading-snug md:leading-tight"><?php the_title(); ?></h2>
 								</a>
 								<div class="text-gray-300 line-clamp-2 hidden md:block max-w-3xl mb-6 text-lg">
 									<?php echo wp_trim_words( wp_strip_all_tags( get_the_excerpt() ), 25, '...' ); ?>

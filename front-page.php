@@ -9,7 +9,8 @@ get_header();
 <main id="primary" class="site-main flex-1">
 
 	<!-- Swiper CSS & JS via CDN (Deferred to improve page load speed) -->
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" media="print" onload="this.media='all'" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" media="print"
+		onload="this.media='all'" />
 	<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
 
 	<!-- Product Categories Carousel -->
@@ -33,24 +34,23 @@ get_header();
 
 
 
-				<!-- Featured Products Section -->
-				<!-- Featured Products Section -->
-				<?php if (class_exists('WooCommerce')): ?>
-					<?php get_template_part('template-parts/home/featured-categories'); ?>
-				<?php endif; ?>
-
-
-				<!-- Testimonials & Brands Section -->
-				<?php get_template_part('template-parts/home/testimonials'); ?>
-
-				<!-- Categories / Benefits Section -->
-				<?php get_template_part('template-parts/home/benefits'); ?>
+			<!-- Featured Products Section -->
+			<!-- Featured Products Section -->
+			<?php if (class_exists('WooCommerce')): ?>
+				<?php get_template_part('template-parts/home/featured-categories'); ?>
+			<?php endif; ?>
+			<!-- Categories / Benefits Section -->
+			<?php get_template_part('template-parts/home/benefits'); ?>
 
 		</div><!-- End Main Content -->
 	</div><!-- End Content Wrapper -->
 
 	<!-- Latest News Section -->
 	<?php get_template_part('template-parts/home/latest-news'); ?>
+
+	<!-- Latest Courses Section -->
+	<?php get_template_part('template-parts/home/latest-courses'); ?>
+
 
 </main><!-- #primary -->
 
