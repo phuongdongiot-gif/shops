@@ -4,7 +4,11 @@
  * Contains Categories, Latest Products, and Latest News.
  */
 ?>
+<<<<<<< HEAD
 <aside class="w-full lg:w-1/4 space-y-8 shrink-0 relative hidden lg:block">
+=======
+<aside class="hidden md:block w-full lg:w-1/4 space-y-8 shrink-0 relative">
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
 
     <!-- Product Categories Widget -->
     <div class="bg-white border border-gray-200">

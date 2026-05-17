@@ -2,7 +2,11 @@
 // Template Part: Left Sidebar (Trang chủ)
 ?>
 <!-- Left Sidebar -->
+<<<<<<< HEAD
 <aside class="w-full lg:w-1/4 space-y-8 shrink-0 relative hidden lg:block">
+=======
+<aside class="hidden md:block w-full lg:w-1/4 space-y-8 shrink-0 relative">
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
 
     <!-- Product Categories Widget -->
     <div class="bg-white border-t border-x border-gray-200 shadow-sm">
@@ -114,16 +118,23 @@
         <div class="p-6 space-y-6">
             <?php
             $widget_news = new WP_Query(array(
+<<<<<<< HEAD
                 'post_type'      => 'post',
                 'posts_per_page' => 8,
                 'post_status'    => 'publish',
                 'orderby'        => 'date',
                 'order'          => 'DESC',
+=======
+                'post_type' => 'post',
+                'posts_per_page' => 2,
+                'post_status' => 'publish',
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
             ));
             if ($widget_news->have_posts()):
                 while ($widget_news->have_posts()):
                     $widget_news->the_post();
                     ?>
+<<<<<<< HEAD
                     <div class="flex gap-3 items-start border-b border-gray-100 pb-4 last:border-0 last:pb-0">
                         <?php if (has_post_thumbnail()): ?>
                             <a href="<?php the_permalink(); ?>" class="shrink-0 rounded overflow-hidden block">
@@ -136,6 +147,20 @@
                             <span class="text-[11px] text-gray-400 font-medium"><?php echo get_the_date('d/m/Y'); ?></span>
                             <h4 class="text-[12.5px] font-semibold text-dark leading-snug hover:text-primary transition-colors mt-0.5">
                                 <a href="<?php the_permalink(); ?>"><?php echo wp_trim_words(get_the_title(), 10, '...'); ?></a>
+=======
+                    <div class="flex gap-4 items-start">
+                        <?php if (has_post_thumbnail()): ?>
+                            <a href="<?php the_permalink(); ?>"
+                                class="shrink-0"><?php the_post_thumbnail('thumbnail', array('class' => 'w-16 h-16 object-cover border border-gray-100 p-1')); ?></a>
+                        <?php else: ?>
+                            <a href="<?php the_permalink(); ?>"
+                                class="w-16 h-16 bg-gray-200 shrink-0 border border-gray-100 p-1 block"></a>
+                        <?php endif; ?>
+                        <div>
+                            <h4
+                                class="text-[13px] font-bold uppercase text-dark leading-tight hover:text-primary transition-colors">
+                                <a href="<?php the_permalink(); ?>"><?php echo wp_trim_words(get_the_title(), 12, '...'); ?></a>
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
                             </h4>
                         </div>
                     </div>
@@ -149,6 +174,7 @@
         </div>
     </div>
 
+<<<<<<< HEAD
     <?php if (class_exists('LearnPress')) :
         $courses_url = get_post_type_archive_link('lp_course') ?: home_url('/courses/');
         $sidebar_courses = new WP_Query(array(
@@ -200,4 +226,6 @@
     </div>
     <?php endif; endif; ?>
 
+=======
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
 </aside>

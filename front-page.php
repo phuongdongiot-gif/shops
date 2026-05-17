@@ -16,8 +16,8 @@ get_header();
 	<!-- Product Categories Carousel -->
 	<?php get_template_part('template-parts/home/category-carousel'); ?>
 
-	<!-- Brand 60 Carousel (2 Rows) -->
-	<?php get_template_part('template-parts/home/brand-carousel'); ?>
+	<!-- Brand Products Carousel (2 hàng) -->
+	<?php get_template_part('template-parts/home/brand-products-carousel'); ?>
 
 	<!-- Content Wrapper with Sidebar -->
 	<div class="container mx-auto px-6 py-12 lg:py-16 flex flex-col lg:flex-row gap-10 items-start">
@@ -39,18 +39,19 @@ get_header();
 			<?php if (class_exists('WooCommerce')): ?>
 				<?php get_template_part('template-parts/home/featured-categories'); ?>
 			<?php endif; ?>
+
+
+			<!-- Testimonials & Brands Section -->
+			<?php get_template_part('template-parts/home/testimonials'); ?>
+
 			<!-- Categories / Benefits Section -->
 			<?php get_template_part('template-parts/home/benefits'); ?>
 
+			<!-- Latest News Section -->
+			<?php get_template_part('template-parts/home/latest-news'); ?>
+
 		</div><!-- End Main Content -->
 	</div><!-- End Content Wrapper -->
-
-	<!-- Latest News Section -->
-	<?php get_template_part('template-parts/home/latest-news'); ?>
-
-	<!-- Latest Courses Section -->
-	<?php get_template_part('template-parts/home/latest-courses'); ?>
-
 
 </main><!-- #primary -->
 

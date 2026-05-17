@@ -6,6 +6,7 @@
 function shopping_enqueue_assets() {
     $theme_version = wp_get_theme()->get('Version');
 
+<<<<<<< HEAD
     // ====== MAIN THEME STYLESHEET (style.css) ======
     wp_enqueue_style(
         'shopping-style',
@@ -13,6 +14,10 @@ function shopping_enqueue_assets() {
         array(),
         filemtime(get_template_directory() . '/style.css')
     );
+=======
+    // Enqueue file chính đã có (style.css, hay tailwind) nếu cần
+    // ...
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
 
     // Chỉ load CSS/JS giao diện trang chủ khi người dùng đang ở front-page (Home)
     if ( is_front_page() || is_home() ) {
@@ -36,7 +41,10 @@ function shopping_enqueue_assets() {
 }
 add_action('wp_enqueue_scripts', 'shopping_enqueue_assets', 20);
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
 /**
  * ======== TỐI ƯU HÓA TỐC ĐỘ VÀ CHUẨN HTML SEO ========
  */

@@ -1,11 +1,20 @@
 <?php
 // Template Part: Benefits (Trang chủ)
 ?>
+<<<<<<< HEAD
 <section class="benefits grid grid-cols-3 gap-6 mb-10 lg:mb-16">
     <!-- Benefit 1 -->
     <div
         class="bg-white border border-gray-100 p-6 rounded-2xl text-center hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300 transform hover:-translate-y-1">
         <div class="w-14 h-14 bg-orange-50 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+=======
+<section class="benefits grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 lg:mb-16">
+    <!-- Benefit 1 -->
+    <div
+        class="bg-white border border-gray-100 p-6 rounded-2xl text-center hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300 transform hover:-translate-y-1">
+        <div
+            class="w-14 h-14 bg-orange-50 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
             </svg>
@@ -20,7 +29,12 @@
     <!-- Benefit 2 -->
     <div
         class="bg-white border border-gray-100 p-6 rounded-2xl text-center hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300 transform hover:-translate-y-1">
+<<<<<<< HEAD
         <div class="w-14 h-14 bg-orange-50 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+=======
+        <div
+            class="w-14 h-14 bg-orange-50 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round"
                     d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
@@ -36,7 +50,12 @@
     <!-- Benefit 3 -->
     <div
         class="bg-white border border-gray-100 p-6 rounded-2xl text-center hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300 transform hover:-translate-y-1">
+<<<<<<< HEAD
         <div class="w-14 h-14 bg-orange-50 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+=======
+        <div
+            class="w-14 h-14 bg-orange-50 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round"
                     d="M10 21h4v-2h-4v2zm5-11c0-2.76-2.24-5-5-5S5 7.24 5 10c0 1.95 1.13 3.63 2.8 4.41V16c0 .55.45 1 1 1h2.4c.55 0 1-.45 1-1v-1.59c1.67-.78 2.8-2.46 2.8-4.41z">
@@ -50,4 +69,8 @@
             <?php echo esc_html(get_theme_mod('home_benefit_3_desc', 'Xử lý đơn linh hoạt, giao hàng siêu tốc toàn quốc.')); ?>
         </p>
     </div>
+<<<<<<< HEAD
 </section>
+=======
+</section>
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a

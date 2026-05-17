@@ -2,7 +2,12 @@
 // Template Part: Featured Categories (Trang chủ)
 ?>
 <section class="featured-products">
+<<<<<<< HEAD
     <div class="mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-5 border-b-2 border-primary pb-3">
+=======
+    <div
+        class="mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-5 border-b-2 border-primary pb-3">
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
 
         <?php
         // Lấy danh mục có nhiều sản phẩm nhất
@@ -57,14 +62,22 @@
                             <!-- Tiêu đề (Màu nổi bật) -->
                             <h2
                                 class="text-white bg-primary py-3 md:py-3.5 px-4 md:px-6 font-heading font-bold uppercase tracking-wide text-[14px] md:text-[18px] flex items-center shrink-0">
+<<<<<<< HEAD
                                 <svg class="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
+=======
+                                <svg class="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
                                     </path>
                                 </svg>
+<<<<<<< HEAD
                                 <span
                                     class="truncate max-w-[120px] sm:max-w-none"><?php echo esc_html($tab_term->name); ?></span>
+=======
+                                <span class="truncate max-w-[120px] sm:max-w-none"><?php echo esc_html($tab_term->name); ?></span>
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
                             </h2>
 
                             <!-- Phần nền mờ bên phải và Nút Xem thêm -->
@@ -76,8 +89,13 @@
                                     <span class="sm:hidden">Xem</span>
                                     <svg class="w-3.5 h-3.5 md:w-4 md:h-4 transform group-hover:translate-x-1 transition-transform"
                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<<<<<<< HEAD
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
                                         </path>
+=======
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5l7 7-7 7"></path>
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
                                     </svg>
                                 </a>
                                 <!-- Nút Dấu Gập -->
@@ -96,8 +114,14 @@
                         <div id="cat-<?php echo esc_attr($tab_term->slug); ?>"
                             class="category-grid-content grid transition-[grid-template-rows] duration-500 ease-in-out"
                             style="grid-template-rows: 1fr;">
+<<<<<<< HEAD
                             <div class="overflow-hidden grid-inner-wrapper transition-opacity duration-300 ease-out">
                                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 py-8">
+=======
+                            <div
+                                class="overflow-hidden grid-inner-wrapper transition-opacity duration-300 ease-out">
+                                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 py-6 sm:py-8">
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
                                     <?php
                                     while ($tab_query->have_posts()):
                                         $tab_query->the_post();
@@ -109,9 +133,15 @@
                                                 <a href="<?php the_permalink(); ?>" class="block">
                                                     <?php
                                                     if (has_post_thumbnail()) {
+<<<<<<< HEAD
                                                         the_post_thumbnail('woocommerce_thumbnail', array('class' => 'w-full h-[200px] object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out'));
                                                     } else {
                                                         echo '<div class="w-full h-[200px] bg-gray-50 flex items-center justify-center text-gray-400 text-xs">Không có ảnh</div>';
+=======
+                                                        the_post_thumbnail('woocommerce_thumbnail', array('class' => 'w-full h-[140px] sm:h-[200px] object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out'));
+                                                    } else {
+                                                        echo '<div class="w-full h-[140px] sm:h-[200px] bg-gray-50 flex items-center justify-center text-gray-400 text-xs">Không có ảnh</div>';
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
                                                     }
                                                     ?>
                                                 </a>
@@ -123,7 +153,12 @@
                                                 <?php endif; ?>
                                             </div>
 
+<<<<<<< HEAD
                                             <div class="p-4 flex flex-col flex-1 bg-white relative z-10 border-t border-gray-50">
+=======
+                                            <div
+                                                class="p-2.5 sm:p-4 flex flex-col flex-1 bg-white relative z-10 border-t border-gray-50">
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
                                                 <?php
                                                 $terms = get_the_terms($product->get_id(), 'product_cat');
                                                 if ($terms && !is_wp_error($terms)) {
@@ -132,7 +167,11 @@
                                                 }
                                                 ?>
                                                 <h3
+<<<<<<< HEAD
                                                     class="text-[13px] font-heading font-bold text-dark mb-1.5 leading-tight uppercase">
+=======
+                                                    class="text-[11px] sm:text-[13px] font-heading font-bold text-dark mb-1 sm:mb-1.5 leading-tight uppercase">
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
                                                     <a href="<?php the_permalink(); ?>"
                                                         class="hover:text-primary transition-colors line-clamp-2">
                                                         <?php the_title(); ?>
@@ -143,16 +182,27 @@
                                                 $short_desc = wp_trim_words(wp_strip_all_tags(get_the_excerpt()), 16, '...');
                                                 if (!empty($short_desc)):
                                                     ?>
+<<<<<<< HEAD
                                                     <div class="text-[12px] text-gray-500 mb-2 line-clamp-2 leading-relaxed">
+=======
+                                                    <div
+                                                        class="hidden sm:block text-[12px] text-gray-500 mb-2 line-clamp-2 leading-relaxed">
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
                                                         <?php echo $short_desc; ?>
                                                     </div>
                                                 <?php endif; ?>
 
                                                 <!-- Add slightly styled price html & Add to list icon -->
                                                 <div
+<<<<<<< HEAD
                                                     class="mt-auto pt-3 flex flex-wrap md:flex-nowrap items-center justify-between border-t border-gray-50/80">
                                                     <div
                                                         class="text-primary font-bold text-[15px] flex items-center gap-1.5 [&>del]:text-[11px] [&>del]:text-gray-400 [&>del]:font-normal [&>ins]:no-underline [&>ins]:text-primary">
+=======
+                                                    class="mt-auto pt-2 sm:pt-3 flex flex-wrap md:flex-nowrap items-center justify-between border-t border-gray-50/80">
+                                                    <div
+                                                        class="text-primary font-bold text-[12px] sm:text-[15px] flex items-center gap-1 sm:gap-1.5 [&>del]:text-[10px] [&>del]:text-gray-400 [&>del]:font-normal [&>ins]:no-underline [&>ins]:text-primary">
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
                                                         <?php
                                                         $price = $product->get_price();
                                                         if (empty($price) || $price == 0) {
@@ -199,4 +249,8 @@
         </div>
 
 
+<<<<<<< HEAD
 </section>
+=======
+</section>
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a

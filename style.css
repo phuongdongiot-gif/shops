@@ -16,7 +16,12 @@ Tags: e-commerce, custom-background, custom-colors, custom-logo, custom-menu, fe
 
 /* Các luật liên quan đến .bg-primary cũng không cần ở đây nữa vì đã có trong JS nhưng lỡ có file compile cũ thì giữ lại base: */
 body {
+<<<<<<< HEAD
   font-size: 14px;
+=======
+  font-size: 15px;
+  /* Nhỏ lại một chút tổng thể */
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
   color: #4B5563;
 }
 
@@ -63,20 +68,32 @@ p {
   padding: 0;
 }
 
+<<<<<<< HEAD
 @media (min-width: 768px) {
 
   .woocommerce ul.products,
   .woocommerce-page ul.products {
     grid-template-columns: repeat(3, 1fr);
+=======
+@media (min-width: 640px) {
+  .woocommerce ul.products,
+  .woocommerce-page ul.products {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
     gap: 1.5rem;
   }
 }
 
 @media (min-width: 1024px) {
+<<<<<<< HEAD
 
   .woocommerce ul.products,
   .woocommerce-page ul.products {
     grid-template-columns: repeat(4, 1fr);
+=======
+  .woocommerce ul.products,
+  .woocommerce-page ul.products {
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
     gap: 2rem;
   }
 }
@@ -111,7 +128,7 @@ p {
 .woocommerce-page ul.products li.product {
   background: white;
   border-radius: 0.75rem;
-  padding: 1rem;
+  padding: 0.5rem;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
   text-align: center;
@@ -132,17 +149,30 @@ p {
   page-break-inside: avoid;
 }
 
+@media (min-width: 640px) {
+  .woocommerce ul.products li.product,
+  .woocommerce-page ul.products li.product {
+    padding: 1rem;
+  }
+}
+
 .woocommerce ul.products li.product:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .woocommerce ul.products li.product a img {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   border-radius: 0.375rem;
   transition: transform 0.5s ease;
   width: 100%;
   object-fit: cover;
+}
+
+@media (min-width: 640px) {
+  .woocommerce ul.products li.product a img {
+    margin-bottom: 1rem;
+  }
 }
 
 .woocommerce ul.products li.product:hover a img {
@@ -150,17 +180,37 @@ p {
 }
 
 .woocommerce ul.products li.product .woocommerce-loop-product__title {
+<<<<<<< HEAD
   font-family: 'Inter', sans-serif !important;
   font-size: 1.125rem;
+=======
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
   color: #111827;
-  margin-top: 0.5rem;
+  margin-top: 0.25rem;
+  line-height: 1.3;
+}
+
+@media (min-width: 640px) {
+  .woocommerce ul.products li.product .woocommerce-loop-product__title {
+    font-size: 1.125rem;
+    margin-top: 0.5rem;
+  }
 }
 
 .woocommerce ul.products li.product .price {
-  color: #4F46E5;
+  color: #ea580c;
   font-weight: 700;
-  font-size: 1rem;
-  margin-bottom: 1rem;
+  font-size: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .woocommerce ul.products li.product .price {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
 }
 
 .woocommerce ul.products li.product .button {
@@ -183,9 +233,22 @@ p {
 }
 
 .woocommerce div.product .product_title {
+<<<<<<< HEAD
   font-family: 'Inter', sans-serif !important;
   font-size: 2.5rem;
   margin-bottom: 1rem;
+=======
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .woocommerce div.product .product_title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
 }
 
 .woocommerce div.product p.price {
@@ -200,6 +263,8 @@ p {
   border-radius: 0.5rem;
   padding: 0.75rem 2rem;
   font-weight: 600;
+  display: block;
+  margin: 0 auto;
 }
 
 .woocommerce div.product form.cart .button:hover {
@@ -286,6 +351,7 @@ p {
   box-shadow: 0 0 0 1px #ea580c;
 }
 
+<<<<<<< HEAD
 /* Override removed to allow Tailwind config (Inter/Outfit) to take effect */
 
 /* ==========================================================================
@@ -1882,4 +1948,65 @@ ul.learn-press-breadcrumb {
 .site-branding img.custom-logo {
   max-width: 160px;
   height: auto;
+=======
+.woocommerce ul.products li.product .button {
+  display: flex;
+}
+
+.woocommerce div.product form.cart {
+  display: flex;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.woocommerce div.product form.cart .button {
+  margin: auto;
+}
+
+/* ===== Brand Products Carousel ===== */
+.brandProductsSwiper {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Swiper Grid mode: cho phép Swiper tự kiểm soát height của slide.
+   KHÔNG dùng h-auto ở đây vì Grid module cần set height cụ thể. */
+.brandProductsSwiper .swiper-slide {
+  /* Đảm bảo card bên trong chiếm hết chiều cao slide */
+  display: flex;
+  flex-direction: column;
+}
+
+.brandProductsSwiper .swiper-slide > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-swiper-pagination .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background: #d1d5db;
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+.brand-swiper-pagination .swiper-pagination-bullet-active {
+  background: #ea580c;
+  width: 24px;
+  border-radius: 4px;
+}
+
+.brand-swiper-prev.swiper-button-disabled,
+.brand-swiper-next.swiper-button-disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+@media (max-width: 639px) {
+  .brand-swiper-prev,
+  .brand-swiper-next {
+    display: none;
+  }
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
 }

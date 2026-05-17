@@ -10,6 +10,7 @@ $is_hero = isset( $args['is_hero'] ) ? $args['is_hero'] : false;
 // Nếu là trang chi tiết (Single post) thì vẫn giữ layout đọc báo
 if ( is_singular() ) :
 ?>
+<<<<<<< HEAD
 <article id="post-<?php the_ID(); ?>" <?php post_class('mb-6 md:mb-10'); ?>>
 	<header class="entry-header mb-4 md:mb-6">
 		<?php the_title( '<h1 class="entry-title text-2xl md:text-4xl font-heading font-extrabold mb-2 md:mb-3 text-dark leading-tight">', '</h1>' ); ?>
@@ -23,28 +24,46 @@ if ( is_singular() ) :
 				</span>
 				
 				<!-- Date -->
+=======
+<article id="post-<?php the_ID(); ?>" <?php post_class('mb-10'); ?>>
+	<header class="entry-header mb-6">
+		<?php the_title( '<h1 class="entry-title text-3xl md:text-4xl font-heading font-extrabold mb-3 text-dark leading-tight">', '</h1>' ); ?>
+		
+		<?php if ( 'post' === get_post_type() ) : ?>
+			<div class="entry-meta flex items-center gap-4 text-[13px] text-gray-500 font-medium mb-6 pb-6 border-b border-gray-100">
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
 				<?php
 				$time_string = '<time class="entry-date published updated flex items-center gap-1.5" datetime="%1$s"><svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>%2$s</time>';
 				printf( $time_string, esc_attr( get_the_date( DATE_W3C ) ), esc_html( get_the_date() ) );
 				?>
+<<<<<<< HEAD
 				
 				<!-- Categories -->
 				<span class="flex items-center gap-1.5">
 					<svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
 					<?php the_category( ', ' ); ?>
 				</span>
+=======
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
 			</div>
 		<?php endif; ?>
 	</header>
 
+<<<<<<< HEAD
 	<?php get_the_post_thumbnail( null, 'large', array( 'class' => 'w-full h-auto mb-5 md:mb-8 rounded-xl shadow-sm' ) ); ?>
 
 	<div class="entry-content text-gray-800 leading-relaxed text-[15px] md:text-[17px]">
+=======
+	<?php get_the_post_thumbnail( null, 'large', array( 'class' => 'w-full h-auto mb-8 rounded-xl shadow-sm' ) ); ?>
+
+	<div class="entry-content text-gray-800 leading-relaxed text-[16px] md:text-[17px]">
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
 		<?php
 		the_content();
 		wp_link_pages( array( 'before' => '<div class="page-links mt-6 font-bold">' . esc_html__( 'Pages:', 'shopping' ), 'after'  => '</div>' ) );
 		?>
 	</div>
+<<<<<<< HEAD
 
 	<footer class="entry-footer mt-8 md:mt-10 pt-5 md:pt-6 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 		<div class="post-tags flex items-center gap-2 flex-wrap">
@@ -66,6 +85,10 @@ if ( is_singular() ) :
 	</footer>
 </article>
 
+=======
+</article>
+
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
 <?php else : // NẾU LÀ TRANG ARCHIVE / DANH SÁCH ?>
 
 <article id="post-<?php the_ID(); ?>" <?php post_class( array( 'bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 flex flex-col group h-full transform hover:-translate-y-1', $is_hero ? 'md:col-span-2 lg:col-span-3 lg:flex-row' : '' ) ); ?>>
@@ -94,17 +117,30 @@ if ( is_singular() ) :
 	</div>
 	
 	<!-- Nội dung text -->
+<<<<<<< HEAD
 	<div class="p-4 md:p-6 flex flex-col flex-1 bg-white relative z-10 <?php echo $is_hero ? 'lg:justify-center' : ''; ?>">
 		<div class="text-[11px] md:text-[12px] text-gray-400 font-semibold mb-2 md:mb-3 flex items-center gap-1.5 uppercase tracking-wider">
+=======
+	<div class="p-6 flex flex-col flex-1 bg-white relative z-10 <?php echo $is_hero ? 'lg:justify-center' : ''; ?>">
+		<div class="text-[12px] text-gray-400 font-semibold mb-3 flex items-center gap-1.5 uppercase tracking-wider">
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
 			<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
 			<?php echo get_the_date(); ?>
 		</div>
 		
+<<<<<<< HEAD
 		<h2 class="entry-title font-heading font-extrabold mb-2 md:mb-3 leading-snug <?php echo $is_hero ? 'text-[20px] md:text-[32px] line-clamp-3' : 'text-[15px] md:text-[18px] line-clamp-2'; ?>">
 			<a href="<?php echo esc_url( get_permalink() ); ?>" rel="bookmark" class="text-dark hover:text-primary transition-colors"><?php the_title(); ?></a>
 		</h2>
 		
 		<div class="text-[13px] md:text-[14px] text-gray-500 mb-4 md:mb-5 leading-relaxed <?php echo $is_hero ? 'line-clamp-4' : 'line-clamp-3'; ?> flex-1">
+=======
+		<h2 class="entry-title font-heading font-extrabold mb-3 leading-snug <?php echo $is_hero ? 'text-[24px] md:text-[32px] line-clamp-3' : 'text-[18px] line-clamp-2'; ?>">
+			<a href="<?php echo esc_url( get_permalink() ); ?>" rel="bookmark" class="text-dark hover:text-primary transition-colors"><?php the_title(); ?></a>
+		</h2>
+		
+		<div class="text-[14px] text-gray-500 mb-5 leading-relaxed <?php echo $is_hero ? 'line-clamp-4' : 'line-clamp-3'; ?> flex-1">
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
 			<?php echo wp_trim_words( wp_strip_all_tags( get_the_excerpt() ), $is_hero ? 40 : 20, '...' ); ?>
 		</div>
 		

@@ -18,10 +18,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 el: '.category-swiper-pagination',
                 clickable: true,
             },
+<<<<<<< HEAD
             navigation: {
                 nextEl: '.category-next',
                 prevEl: '.category-prev',
             },
+=======
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
             breakpoints: {
                 480: { slidesPerView: 3, spaceBetween: 16 },
                 768: { slidesPerView: 4, spaceBetween: 24 },
@@ -31,21 +34,42 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+<<<<<<< HEAD
     // Khởi tạo Brand Swiper (2 Rows via HTML structure)
     if (document.querySelector('.brandSwiper') && typeof Swiper !== 'undefined') {
         new Swiper('.brandSwiper', {
             slidesPerView: 2,
             spaceBetween: 16,
+=======
+    // 1b. Khởi tạo Brand Products Carousel Swiper (2 hàng)
+    function initBrandSwiper() {
+        if (!document.querySelector('.brandProductsSwiper') || typeof Swiper === 'undefined') {
+            return false;
+        }
+        new Swiper('.brandProductsSwiper', {
+            slidesPerView: 2,
+            slidesPerGroup: 2,
+            spaceBetween: 12,
+            grid: {
+                rows: 2,
+                fill: 'row',
+            },
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
             loop: false,
             autoplay: {
                 delay: 5000,
                 disableOnInteraction: false,
+<<<<<<< HEAD
+=======
+                pauseOnMouseEnter: true,
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
             },
             pagination: {
                 el: '.brand-swiper-pagination',
                 clickable: true,
             },
             navigation: {
+<<<<<<< HEAD
                 nextEl: '.brand-next',
                 prevEl: '.brand-prev',
             },
@@ -56,6 +80,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 1280: { slidesPerView: 5, spaceBetween: 24 },
             }
         });
+=======
+                nextEl: '.brand-swiper-next',
+                prevEl: '.brand-swiper-prev',
+            },
+            breakpoints: {
+                480: { slidesPerView: 2, slidesPerGroup: 2, grid: { rows: 2, fill: 'row' }, spaceBetween: 14 },
+                768: { slidesPerView: 3, slidesPerGroup: 3, grid: { rows: 2, fill: 'row' }, spaceBetween: 18 },
+                1024: { slidesPerView: 4, slidesPerGroup: 4, grid: { rows: 2, fill: 'row' }, spaceBetween: 20 },
+                1280: { slidesPerView: 5, slidesPerGroup: 5, grid: { rows: 2, fill: 'row' }, spaceBetween: 24 },
+            }
+        });
+        return true;
+    }
+
+    // Thử khởi tạo ngay, nếu Swiper chưa load thì retry sau 200ms (CDN defer)
+    if (!initBrandSwiper()) {
+        var brandRetry = setInterval(function() {
+            if (initBrandSwiper()) {
+                clearInterval(brandRetry);
+            }
+        }, 200);
+        // Dừng retry sau 5 giây
+        setTimeout(function() { clearInterval(brandRetry); }, 5000);
+>>>>>>> f718bdd7cf4de9a5722f3aaabca47e9c00585f8a
     }
 
     // 2. Khởi tạo Hero Swiper (Banner Chính)
